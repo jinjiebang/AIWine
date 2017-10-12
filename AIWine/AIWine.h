@@ -22,7 +22,7 @@ public:
 
 	int nSearched;							//每次思考时,搜索的局面数
 	Cand rootCand[MaxCand];					//根节点分支
-	int nRootCand;
+	int nRootCand;							//根节点分支数
 	int timeout_turn;
 	int timeout_match;
 	int time_left;
