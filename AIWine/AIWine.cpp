@@ -19,7 +19,7 @@ bool AIWine::setSize(int size)
 	board->initBoard(size);
 	return true;
 }
-void AIWine::reStart()
+void AIWine::restart()
 {
 	board->initBoard(board->boardSize);
 }
@@ -42,12 +42,11 @@ void AIWine::turnBest(int &x, int &y)
 		return;
 	}
 	nSearched = 0;
-	nRootCand = 0;
 	Cand best = { 0,0 };
-	for (int depth = 1; depth < MaxDepth; depth++)
+	for (int depth = MinDepth; depth <=MaxDepth; depth++)
 	{
 		best = rootSearch(depth, -10000, 10000);
-		if (best.value == 10000) break;
+		if (best.value == 10000 || nRootCand == 1) break;
 	}
 	assert(board->inBoard(best.point));
 	x = pointX(best.point) - 4;
@@ -56,19 +55,27 @@ void AIWine::turnBest(int &x, int &y)
 }
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
 {
-	if (nRootCand == 0)
+	if(depth>MinDepth)
+	{
+		delLoseCand(rootCand, nRootCand);
+	}
+	else
 	{
 		board->generateCand(rootCand, nRootCand);
-		delLoseCand(rootCand, nRootCand);
-		if (nRootCand == 1)
-		{
-			rootCand[0].value = 0;
-			return rootCand[0];
-		}
-		else
-		{
-			sortCand(rootCand, nRootCand);
-		}
+	}
+
+	if (nRootCand == 0)
+	{
+		board->getEmptyCand(rootCand, nRootCand);
+	}
+	else if (nRootCand == 1)
+	{
+		rootCand[0].value = 0;
+		return rootCand[0];
+	}
+	else
+	{
+		sortCand(rootCand, nRootCand);
 	}
 	Cand best = Cand(0, alpha - 1);
 	int value;
@@ -96,26 +103,21 @@ int AIWine::search(int depth, int alpha, int beta)
 	{
 		return q > 0 ? 10000 : -10000;
 	}
-	if (depth == 0)
+	if (depth <= 0)
 	{
 		return board->evaluate();
 	}
 	Cand cand[MaxCand];
 	int nCand = 0;
 	board->generateCand(cand, nCand);
-	if (nCand > 1)
+
+	if (nCand == 0)
+	{
+		board->getEmptyCand(cand, nCand);
+	}
+	else if (nCand > 1)
 	{
 		sortCand(cand, nCand);
-	}
-	else if (nCand == 0)
-	{
-		for (int i = 0; i < 1024; i++)
-		{
-			if (board->inBoard(i) && nCand < MaxCand)
-			{
-				cand[nCand++] = { i,0 };
-			}
-		}
 	}
 	int value;
 	for (int i = 0; i < nCand; i++)
@@ -138,7 +140,7 @@ void AIWine::delLoseCand(Cand cand[], int &nCand)
 {
 	for (int i = 0; i < nCand; i++)
 	{
-		if (cand[i].value = -10000)
+		if (cand[i].value == -10000)
 		{
 			for (int j = i + 1; j < nCand; j++)
 			{
@@ -165,7 +167,7 @@ void AIWine::sortCand(Cand cand[], int nCand)
 bool AIWine::isValidPos(int x, int y)
 {
 	int size = board->boardSize;
-	return x >= 0 && x < size && y >= 0 && y < size && board->pointPiece(x, y) == EMPTY;
+	return x >= 0 && x < size && y >= 0 && y < size && board->pointPiece(x + 4, y + 4) == EMPTY;
 }
 
 

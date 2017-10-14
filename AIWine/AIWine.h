@@ -10,8 +10,9 @@ public:
 	~AIWine();
 	static const int MaxSize = 28;
 	static const int MaxDepth = 8;
+	static const int MinDepth = 1;
 	static const int MaxCand = 256;
-	void reStart();
+	void restart();
 	void turnUndo();
 	bool setSize(int size);
 	bool isValidPos(int x, int y);

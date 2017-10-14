@@ -55,13 +55,14 @@ void Board::initBoard(int size)
 	chessCount = 0;
 	who = BLACK;
 	opp = WHITE;
-	upperLeft = makePoint(4, 4);
-	lowerRight = makePoint(boardSize + 3, boardSize + 3);
+	upperLeft = makePoint(boardSize + 3, boardSize + 3);
+	lowerRight = makePoint(4,4);
 	memset(nShape, 0, sizeof(nShape));
 }
 //落子
 void Board::move(Point p)
 {
+	assert(check());
 	nShape[0][board[p].shape4[0]]--;
 	nShape[1][board[p].shape4[1]]--;
 
@@ -72,13 +73,13 @@ void Board::move(Point p)
 	remLRCand[chessCount] = lowerRight;
 	chessCount++;
 
-	int x1 = pointX(p) - 2, y1 = pointY(p) - 2;
-	int x2 = pointX(p) + 2, y2 = pointY(p) + 2;
+	int x1 = pointX(upperLeft), y1 = pointY(upperLeft);
+	int x2 = pointX(lowerRight), y2 = pointY(lowerRight);
 
-	if (x1 < pointX(upperLeft)) x1 = max(x1, 4);
-	if (y1 < pointY(upperLeft)) y1 = max(y1, 4);
-	if (x2 > pointX(lowerRight)) x2 = min(x2, boardSize + 3);
-	if (y2 > pointY(lowerRight)) y2 = min(y2, boardSize + 3);
+	if (pointX(p) - 2 < x1) x1 = max(pointX(p) - 2, 4);
+	if (pointY(p) - 2 < y1) y1 = max(pointY(p) - 2, 4);
+	if (pointX(p) + 2 > x2) x2 = min(pointX(p) + 2, boardSize + 3);
+	if (pointY(p) + 2 > y2) y2 = min(pointY(p) + 2, boardSize + 3);
 	upperLeft = makePoint(x1, y1);
 	lowerRight = makePoint(x2, y2);
 
@@ -86,7 +87,7 @@ void Board::move(Point p)
 	for (int k = 0; k < 4; k++)
 	{
 		Point move_p = p;
-		//move_p在p的右边，高位更新
+		//p在move_p的右边，高位更新
 		for (UCHAR m = 16; m != 0; m <<= 1)
 		{
 			move_p -= MOV[k];
@@ -100,7 +101,7 @@ void Board::move(Point p)
 			}
 		}
 		move_p = p;
-		//move_p在p的左边，低位更新
+		//p在move_p的左边，低位更新
 		for (UCHAR m = 8; m != 0; m >>= 1)
 		{
 			move_p += MOV[k];
@@ -121,10 +122,11 @@ void Board::move(Point p)
 	}
 	who = oppent(who);
 	opp = oppent(opp);
-
+	assert(check());
 }
 void Board::undo()
 {
+	assert(check());
 	chessCount--;
 	Point p = remPoint[chessCount];
 	upperLeft = remULCand[chessCount];
@@ -149,8 +151,8 @@ void Board::undo()
 	for (int k = 0; k < 4; k++)
 	{
 		Point move_p = p;
-		//move_p在p的右边，高位更新
-		for (UCHAR m = 16; m != 0 && move_p - MOV[k]>0; m <<= 1)
+		//p在move_p的右边，更新move_p的高位
+		for (UCHAR m = 16; m != 0 ; m <<= 1)
 		{
 			move_p -= MOV[k];
 			board[move_p].pattern[k][who] ^= m;
@@ -163,7 +165,7 @@ void Board::undo()
 			}
 		}
 		move_p = p;
-		//move_p在p的左边，低位更新
+		//p在move_p的的左边，更新move_p的低位
 		for (UCHAR m = 8; m != 0; m >>= 1)
 		{
 			move_p += MOV[k];
@@ -180,17 +182,19 @@ void Board::undo()
 	//更新8个方向，两步以内的棋子数
 	for (int i = 0; i < 16; i++)
 	{
-		board[p + RANGE[i]].neighbor++;
+		board[p + RANGE[i]].neighbor--;
 	}
+	assert(check());
 }
 //生成所有分支
 void Board::generateCand(Cand cand[], int& nCand)
 {
-	if (nShape[who][FIVE] > 0) 
+	
+	if (nShape[who][A] > 0) 
 	{ 
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
-			if (board[i].isCand() && board[i].shape4[who] == FIVE)
+			if (board[i].isCand() && board[i].shape4[who] == A)
 			{
 				nCand = 1;
 				cand[0].point = i;
@@ -198,11 +202,12 @@ void Board::generateCand(Cand cand[], int& nCand)
 			}
 		}
 	}
-	if (nShape[opp][FIVE] > 0)
+	
+	if (nShape[opp][A] > 0)
 	{
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
-			if (board[i].isCand() && board[i].shape4[opp] == FIVE)
+			if (board[i].isCand() && board[i].shape4[opp] == A)
 			{
 				nCand = 1;
 				cand[0].point = i;
@@ -210,11 +215,11 @@ void Board::generateCand(Cand cand[], int& nCand)
 			}
 		}
 	}
-	if (nShape[who][FLEX4] > 0)
+	if (nShape[who][B] > 0)
 	{
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
-			if (board[i].isCand() && board[i].shape4[who] == FLEX4)
+			if (board[i].isCand() && board[i].shape4[who] == B)
 			{
 				nCand = 1;
 				cand[0].point = i;
@@ -222,19 +227,17 @@ void Board::generateCand(Cand cand[], int& nCand)
 			}
 		}
 	}
-	if (nShape[opp][FLEX4] > 0)
+	if (nShape[opp][B] > 0)
 	{
 		nCand = 0;
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
-			if (board[i].isCand())
+			if (board[i].isCand()&&(board[i].shape4[who] >= E || board[i].shape4[opp] >= E))
 			{
-				if (board[i].shape4[who] >= E || board[i].shape4[opp] >= E)
-				{
-					cand[nCand].value = board[i].prior();
-					cand[nCand].point = i;
-					if (cand[nCand].value > 0) nCand++;
-				}
+				cand[nCand].value = board[i].prior();
+				cand[nCand].point = i;
+				if (cand[nCand].value > 4) nCand++;
+				assert(nCand <= 256);
 			}
 		}
 		return;
@@ -248,6 +251,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 			cand[nCand].value = board[i].prior();
 			cand[nCand].point = i;
 			if (cand[nCand].value > 0) nCand++;
+			assert(nCand <= 256);
 		}
 	}
 }
@@ -261,18 +265,11 @@ int Board::evaluate()
 	{
 		c = remChess[i];
 		p = c->piece;
-		if (p != 0 && p != 1)
-		{
-			p = 0;
-		}
+		assert(p == BLACK || p == WHITE);
 		for (int k = 0; k < 4; k++)
 		{
 			eval[p] += ChessShape::shapePrior[c->pattern[k][p]][c->pattern[k][1 - p]];
 		}
-	}
-	if (who >= 2 || opp >= 2)
-	{
-		eval[0] = eval[1] = 0;
 	}
 	return eval[who] - eval[opp];
 }
@@ -283,19 +280,15 @@ int Board::quickWinSearch()
 	if (nShape[opp][A] >= 2) return -2;  
 	if (nShape[opp][A] == 1)             
 	{
-		for (int m = 0; m < 1024; m++)
+		for (int m = upperLeft; m < lowerRight; m++)
 		{
-			if (board[m].isCand())
+			if (board[m].isCand()&& board[m].shape4[opp] == A)
 			{
-				if (board[m].shape4[opp] == A)
-				{
-
-					move(m);
-					q = -quickWinSearch();
-					undo();
-					if (q < 0) q--; else if (q > 0) q++;
-					return q;
-				}
+				move(m);
+				q = -quickWinSearch();
+				undo();
+				if (q < 0) q--; else if (q > 0) q++;
+				return q;
 			}
 		}
 			
@@ -304,17 +297,16 @@ int Board::quickWinSearch()
 	if (nShape[who][C] >= 1)             // XOOO_ * _OO
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
-		for (int m = 0; m < 1024; m++)
+		for (int m = upperLeft; m < lowerRight; m++)
 		{
-			if (board[m].isCand())
+			if (board[m].isCand()&&board[m].shape4[who] == C)
 			{
-				if (board[m].shape4[who] == C)
-				{
-					move(m);
-					q = -quickWinSearch();
-					undo();
-					if (q > 0) return q + 1;
-				}
+				
+				move(m);
+				q = -quickWinSearch();
+				undo();
+				if (q > 0) return q + 1;
+				
 			}
 		}
 	}
@@ -323,4 +315,30 @@ int Board::quickWinSearch()
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
 	}
 	return 0;
+}
+void Board::getEmptyCand(Cand cand[], int &nCand)
+{
+	for (int m = upperLeft; m < lowerRight; m++)
+	{
+		if (board[m].piece==EMPTY)
+		{
+			cand[nCand++] = { m,0 };
+		}
+	}
+}
+bool Board::check()
+{
+	int n[2][10] = { 0 };
+	for (int m = 0; m < 1024; m++)
+	{
+		if (board[m].piece==EMPTY)
+		{
+			n[0][board[m].shape4[0]]++;
+			n[1][board[m].shape4[1]]++;
+		}
+	}
+	for (int i = 0; i < 2; i++)
+		for (int j = 1; j < 10; j++)
+			if (n[i][j] != nShape[i][j]) return false;
+	return true;
 }

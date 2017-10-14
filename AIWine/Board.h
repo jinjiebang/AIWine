@@ -19,11 +19,15 @@ public:
 	void initBoard(int size);
 	void move(Point p);
 	void undo();
+	bool check();
 	void generateCand(Cand cand[], int &nCand);
+	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
 	int quickWinSearch();
 
 	//内联方法
+	/*int getShape4(int index, int piece) { return board[index].shape4[piece]; }
+	int getShape(int index, int piece, int i) { return board[index].shape[i][piece]; }*/
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
@@ -33,5 +37,5 @@ public:
 	bool inBoard(int index) { return board[index].piece != OUTSIDE; }
 	int oppent(int piece) { return piece == BLACK ? WHITE : BLACK; }
 private:
-	const int MAX_BOARD_SIZE = 30;
+	const int MAX_SIZE = 28;
 };

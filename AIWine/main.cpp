@@ -43,7 +43,7 @@ int gomocup()
 		}
 		else if (command == "RESTART")
 		{
-			ai->reStart();
+			ai->restart();
 			cout << "OK" << endl;
 		}
 		else if (command == "TAKEBACK")
@@ -65,6 +65,7 @@ int gomocup()
 			{
 				ai->turnMove(x, y);
 				ai->turnBest(x, y);
+				cout << "MESSAGE " << "NODE:" << ai->nSearched << endl;
 				cout << x << "," << y << endl;
 			}
 			else
@@ -76,7 +77,7 @@ int gomocup()
 		{
 			int x, y, c;
 			stringstream ss;
-			ai->reStart();
+			ai->restart();
 
 			cin >> command;
 			toupper(command);
@@ -154,5 +155,7 @@ int gomocup()
 int main()
 {
 	gomocup();
+	/*ChessShape::initShape();
+	ChessShape::testShape();*/
 
 }

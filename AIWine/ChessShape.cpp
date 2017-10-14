@@ -141,11 +141,12 @@ void ChessShape::testShape()
 	{
 		cout << (int)bitCount(p[i]) << endl;
 	}
-	string testData[13] = { "_OOOOO___","____OOOO_","__O_OOO__","O_O_O_O__","__OOO____","_XOOO____","X_OOO_X__","__O_O____","X__OO__X_","X_O_O_X__","__XOO____","____O____", "X___O_X__" };
+	string testData[13] = { "__OOOOO__","____OOOO_","__O_OOO__","O_O_O_O__","__OOO____","_XOOO____","X_OOO_X__","__O_O____","X__OO__X_","X_O_O_X__","__XOO____","____O____", "X___O_X__" };
 	for (int i = 0; i < 13; i++)
 	{
 		cout << getShapeName(testData[i]) << " 棋型分值：" << testShapeScore(testData[i]) << endl;
 	}
+	cin >> p[0];
 }
 //获取p的二进制编码中1的个数
 UCHAR ChessShape::bitCount(UCHAR p)
@@ -179,13 +180,11 @@ int ChessShape::testShapeScore(string shapeStr)
 			mask <<= 1;
 		}
 	}
-	//return getShapeScore(p1, p2);
 	return shapePrior[p1][p2];
 }
 int ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 {
 	int score = 0;
-	/*int n3 = 0, n4 = 0;*/
 	int val[5] = { 1,4,9,16,25 };
 	UCHAR shapeMask[5] = { 0xF0,0x78,0x3C,0x1E,0x0F };
 	for (int i = 0; i < 5; i++)
@@ -193,12 +192,9 @@ int ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 		if ((p2&shapeMask[i]) == 0)
 		{
 			int cnt = bitCount(p1&shapeMask[i]);
-			//if (cnt == 3) n3++; else if (cnt == 4) n4++;
 			score += val[cnt];
 		}
 	}
-	//if (n4 >= 1) return 1000;
-	//if (n3 >= 2) return 200;
 	return score;
 }
 short ChessShape::calPrior(UCHAR pattern[4][2])
