@@ -13,6 +13,10 @@ public:
 	static char shapeTable[256][256];	//棋型表
 	static int shapePrior[256][256];	//棋型等级表
 	static char fourShapeTable[10][10][10][10];//组合棋形表
+	static const string shapeName[10];
+	static const string shape4Name[9];
+	static string getShapeName(int index) { return shapeName[index]; }
+	static string getShape4Name(int index) { return shape4Name[index]; }
 	
 private:
 	//获取组合棋型

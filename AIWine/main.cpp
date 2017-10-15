@@ -1,5 +1,6 @@
 #include "AIWine.h"
 #include "ChessShape.h"
+#include <assert.h>
 #include<iostream>
 #include<string>
 #include<sstream>
@@ -65,7 +66,7 @@ int gomocup()
 			{
 				ai->turnMove(x, y);
 				ai->turnBest(x, y);
-				cout << "MESSAGE " << "NODE:" << ai->nSearched << endl;
+				cout << "MESSAGE " << "node:" << ai->nSearched << " eval:" << ai->rootBest.value << " max_ply:" << ai->getMaxPly() << endl;
 				cout << x << "," << y << endl;
 			}
 			else
@@ -97,8 +98,6 @@ int gomocup()
 				cin >> command;
 				toupper(command);
 			}
-			ai->turnBest(x, y);
-			cout << x << "," << y << endl;
 		}
 		else if (command == "INFO")
 		{

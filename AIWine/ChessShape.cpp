@@ -5,6 +5,8 @@ using namespace std;
 char ChessShape::shapeTable[256][256] = { 0 };
 int ChessShape::shapePrior[256][256] = { 0 };
 char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
+const string ChessShape::shapeName[10] = { "为空", "眠一", "活一", "眠二", "活二", "眠三", "活三", "眠四", "活四", "五连" };
+const string ChessShape::shape4Name[9] = { "为空", "活三", "三二", "三三", "冲四", "四二", "四三", "活四", "五连" };
 void ChessShape::initShape()
 {
 	memset(shapeTable, 0, sizeof(shapeTable));
