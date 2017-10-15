@@ -9,7 +9,7 @@ public:
 	static void initShape();
 	static void testShape();
 	static int testShapeScore(string shapeStr);
-	static short calPrior(UCHAR pattern[4][2]);
+	static short calPrior(UCHAR pattern[4][2],int who);
 	static char shapeTable[256][256];	//棋型表
 	static int shapePrior[256][256];	//棋型等级表
 	static char fourShapeTable[10][10][10][10];//组合棋形表

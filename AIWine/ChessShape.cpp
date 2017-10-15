@@ -199,14 +199,9 @@ int ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 	}
 	return score;
 }
-short ChessShape::calPrior(UCHAR pattern[4][2])
+short ChessShape::calPrior(UCHAR pattern[4][2],int who)
 {
-	return shapePrior[pattern[0][0]][pattern[0][1]] +
-		shapePrior[pattern[1][0]][pattern[1][1]] +
-		shapePrior[pattern[2][0]][pattern[2][1]] +
-		shapePrior[pattern[3][0]][pattern[3][1]] +
-		shapePrior[pattern[0][1]][pattern[0][0]] +
-		shapePrior[pattern[1][1]][pattern[1][0]] +
-		shapePrior[pattern[2][1]][pattern[2][0]] +
-		shapePrior[pattern[3][1]][pattern[3][0]];
+	int v1= shapePrior[pattern[0][1]][pattern[0][0]] +shapePrior[pattern[1][1]][pattern[1][0]] +shapePrior[pattern[2][1]][pattern[2][0]] +shapePrior[pattern[3][1]][pattern[3][0]];
+	int v0 = shapePrior[pattern[0][0]][pattern[0][1]] + shapePrior[pattern[1][0]][pattern[1][1]] + shapePrior[pattern[2][0]][pattern[2][1]] + shapePrior[pattern[3][0]][pattern[3][1]];
+	return who == 0 ? (v0 << 1) + v1 : (v1 << 1) + v0;
 }

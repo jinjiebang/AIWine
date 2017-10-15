@@ -21,7 +21,7 @@ public:
 	Point lowerRight;						//右下角
 	int ply;								//当前搜索层数
 	int maxPly;								//最大搜索层数
-	int LimitPly;							//vcf限制层数
+	int limitPly;							//vcf限制层数
 	
 
 	void initBoard(int size);
@@ -41,6 +41,7 @@ public:
 			(nShape[who][C] == 0 && nShape[who][D] == 0 && nShape[who][E] == 0 && (nShape[opp][B] > 0 || nShape[opp][C] > 0));*/
 		return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0;
 	}
+	bool isAttack() { return nShape[who][D] > 0 /*|| nShape[who][G] > 0*/; }
 	int getShape4(int index, int piece) { return board[index].shape4[piece]; }
 	int getShape(int index, int piece, int i) { return board[index].shape[i][piece]; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }

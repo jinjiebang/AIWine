@@ -13,6 +13,6 @@ public:
 	UCHAR shape[4][2];
 	UCHAR shape4[2];
 	
-	short prior();
+	short prior(int who);
 	bool isCand() { return neighbor > 0 && piece == EMPTY; }
 };

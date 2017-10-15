@@ -98,6 +98,12 @@ int gomocup()
 				cin >> command;
 				toupper(command);
 			}
+			if (c == 2)
+			{
+				ai->turnBest(x, y);
+				cout << "MESSAGE " << "node:" << ai->nSearched << " eval:" << ai->rootBest.value << " max_ply:" << ai->getMaxPly() << endl;
+				cout << x << "," << y << endl;
+			}
 		}
 		else if (command == "INFO")
 		{

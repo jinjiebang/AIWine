@@ -266,7 +266,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		{
 			if (board[i].isCand()&&(board[i].shape4[who] >= E || board[i].shape4[opp] >= E))
 			{
-				cand[nCand].value = board[i].prior();
+				cand[nCand].value = board[i].prior(who);
 				cand[nCand].point = i;
 				if (cand[nCand].value >= 5) nCand++;
 				assert(nCand <= 256);
@@ -280,7 +280,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 	{
 		if (board[i].isCand())
 		{
-			cand[nCand].value = board[i].prior();
+			cand[nCand].value = board[i].prior(who);
 			cand[nCand].point = i;
 			if (cand[nCand].value > 0) nCand++;
 			assert(nCand <= 256);
@@ -401,7 +401,7 @@ int Board::vcfSearch()
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
 	}
 	//vcfÀ©Õ¹
-	if (ply < LimitPly && nShape[who][D] >= 1)
+	if (ply < limitPly && nShape[who][D] >= 1)
 	{
 		for (int m = upperLeft; m < lowerRight; m++)
 		{

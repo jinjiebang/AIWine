@@ -56,7 +56,7 @@ void AIWine::turnBest(int &x, int &y)
 	board->ply = 0; board->maxPly = 0;
 	for (int depth = MinDepth; depth <=MaxDepth; depth++)
 	{
-		board->LimitPly = depth + 4;
+		board->limitPly = depth + 4;
 		best = rootSearch(depth, -10000, 10000);
 		if (best.value == 10000 || nRootCand == 1) break;
 	}
