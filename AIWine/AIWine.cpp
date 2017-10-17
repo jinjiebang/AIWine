@@ -11,6 +11,7 @@ AIWine::~AIWine()
 {
 	delete board;
 }
+//设置棋盘尺寸
 bool AIWine::setSize(int size)
 {
 	if (size<5 || size>MaxSize)
@@ -20,25 +21,36 @@ bool AIWine::setSize(int size)
 	board->initBoard(size);
 	return true;
 }
+//重新开始
 void AIWine::restart()
 {
 	board->initBoard(board->boardSize);
 }
+//悔棋
 void AIWine::turnUndo()
 {
 	board->undo();
 }
+//显示搜索的信息
+void AIWine::showDepthInfo(int depth,Cand best, long td)
+{
+	cout << "MESSAGE depth: " << depth << "-" << board->maxPly
+		<< " [" << pointX(best.point) - 4 << "," << pointY(best.point) - 4 << "]"
+		<< " val=" << best.value << " time:" << td << "ms" << endl;
+}
+//落子
 void AIWine::turnMove(int x, int y)
 {
-	/*int pointPiece = board->who;
-	assert(pointPiece == BLACK || pointPiece == WHITE);
-	cout << "MESSAGE 落子为：" + getPiece(pointPiece) << endl;*/
 	int point = makePoint(x + 4, y + 4);
 	board->move(point);
-	/*cout << "MESSAGE 落子结束！"<< endl;*/
 }
+//获取最佳点
 void AIWine::turnBest(int &x, int &y)
 {
+	Cand best;
+	long t0, t1, td;
+	start_time = getTime();
+	terminateAI = false;
 	if (board->chessCount == 0)
 	{
 		x = board->boardSize / 2;
@@ -47,25 +59,25 @@ void AIWine::turnBest(int &x, int &y)
 		return;
 	}
 	nSearched = 0;
-	Cand best = { 0,0 };
 	board->generateCand(rootCand, nRootCand);
-	/*if (nRootCand == 1)
-	{
-		cout <<"MESSAGE oneCand:"<< pointX(rootCand[0].point) - 4 << "," << pointY(rootCand[0].point) - 4 << endl;
-	}*/
-	board->ply = 0; board->maxPly = 0;
 	for (int depth = MinDepth; depth <=MaxDepth; depth++)
 	{
-		board->limitPly = depth + 4;
+		board->ply = 0, board->maxPly = 0, board->limitPly = depth + 8;
+		t0 = getTime();
+
 		best = rootSearch(depth, -10000, 10000);
-		if (best.value == 10000 || nRootCand == 1) break;
+		if (best.point != 0) rootBest = best;
+
+		t1 = getTime(); td = t1 - t0;
+		showDepthInfo(depth, rootBest, td);
+		if (rootBest.value == 10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 	}
-	rootBest = best;
-	x = pointX(best.point) - 4;
-	y = pointY(best.point) - 4;
+	x = pointX(rootBest.point) - 4;
+	y = pointY(rootBest.point) - 4;
 	assert(isValidPos(x, y));
 	turnMove(x, y);
 }
+//根节点搜索
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
 {
 	if(depth>MinDepth)
@@ -92,31 +104,10 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 	{
 		sortCand(rootCand, nRootCand);
 	}
-	/*int opp = board->opp;
-	int who = board->who;
-	int nShape[2][10] = { 0 };
-	for (int k = 0; k < 10; k++)
-	{
-		nShape[opp][k] = board->nShape[opp][k];
-		nShape[who][k] = board->nShape[who][k];
-	}
-	cout << "MESSAGE nShape:" << " who=" << getPiece(who) << " (" << nShape[who][A] << "," << nShape[who][B] << "," << nShape[who][C] << ")" << endl;
-	cout << "MESSAGE nShape:" << " opp=" << getPiece(opp) << " (" << nShape[opp][A] << "," << nShape[opp][B] << "," << nShape[opp][C] << ")" << endl;*/
 	Cand best = Cand(0, alpha - 1);
 	int value;
 	for (int i = 0; i < nRootCand; i++)
 	{
-		/*int point = rootCand[i].point;
-		int x = board->pointX(point) - 4;
-		int y = board->pointY(point) - 4;
-		int shape[4] = { 0 };
-		for (int k = 0; k < 4; k++)
-		{
-			shape[k] = board->getShape(point, who, k);
-		}
-		cout << "MESSAGE" << " point=[" << x << "," << y << "] piece=" << getPiece(who) << " prior=" << rootCand[i].value << endl;
-		cout << "MESSAGE" << " shape:[" << getShapeName(shape[0]) << "," << getShapeName(shape[1]) << "," << getShapeName(shape[2]) << "," << getShapeName(shape[3]) << "] shape4=[" << getShape4Name(board->getShape4(point, who)) << "," << getShape4Name(board->getShape4(point, opp)) << "]" << endl;*/
-
 		board->move(rootCand[i].point);
 		do
 		{
@@ -131,21 +122,29 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 			value = -search(depth - 1, -beta, -alpha);
 		} while (0);
 		board->undo();
-		/*cout << "MESSAGE value=" << value << endl;*/
-		
+		if (terminateAI) break;
+
 		rootCand[i].value = value;
-		if (value > best.value)
+		if (value > best.value )
 		{
 			best = rootCand[i];
 			alpha = value;
 			if (value == 10000) return best;
 		}
+		
 	}
 	return best;
 
 }
+//搜索主函数
 int AIWine::search(int depth, int alpha, int beta)
 {
+	static int cnt;
+	if (--cnt<0)
+	{
+		cnt = 1000;
+		if (getTime() - stopTime() > 0) terminateAI = true;
+	}
 	nSearched++;
 	int q = board->quickWinSearch();
 	if (q != 0)
@@ -155,7 +154,7 @@ int AIWine::search(int depth, int alpha, int beta)
 	if (depth <= 0)
 	{
 		int eval = board->evaluate();
-		if (eval > -beta&&eval < -alpha)
+		if (eval>alpha && eval<beta)
 		{
 			if (board->isExpand())
 			{
@@ -204,6 +203,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			value = -search(depth - 1, -beta, -alpha);
 		} while (0);
 		board->undo();
+
 		if (value >= beta)
 		{
 			return beta;
@@ -212,9 +212,11 @@ int AIWine::search(int depth, int alpha, int beta)
 		{
 			alpha = value;
 		}
+		if (terminateAI) break;
 	}
 	return alpha;
 }
+//删除必败点
 void AIWine::delLoseCand(Cand cand[], int &nCand)
 {
 	for (int i = 0; i < nCand; i++)
@@ -229,6 +231,7 @@ void AIWine::delLoseCand(Cand cand[], int &nCand)
 		}
 	}
 }
+//排序选点
 void AIWine::sortCand(Cand cand[], int nCand)
 {
 	Cand key;
@@ -243,18 +246,9 @@ void AIWine::sortCand(Cand cand[], int nCand)
 		cand[j] = key;
 	}
 }
+//判断坐标是否有效
 bool AIWine::isValidPos(int x, int y)
 {
 	int size = board->boardSize;
 	return x >= 0 && x < size && y >= 0 && y < size && board->pointPiece(x + 4, y + 4) == EMPTY;
 }
-
-
-
-
-
-
-
-
-
-

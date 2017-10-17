@@ -15,7 +15,6 @@ public:
 	int chessCount;							//棋子数
 	int who, opp;							//当前下子方，以及另一方
 	int nShape[2][10];						//双方下一步能成的棋形统计
-	int remShape[2][10][256];					//记录能成棋形的最新一个点
 	int boardSize;							//棋盘尺寸
 	Point upperLeft;						//左上角
 	Point lowerRight;						//右下角
@@ -35,15 +34,7 @@ public:
 	int vcfSearch();
 
 	//内联方法
-	bool isExpand() 
-	{ 
-		/*return nShape[opp][A] > 0 ||
-			(nShape[who][C] == 0 && nShape[who][D] == 0 && nShape[who][E] == 0 && (nShape[opp][B] > 0 || nShape[opp][C] > 0));*/
-		return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0;
-	}
-	bool isAttack() { return nShape[who][D] > 0 /*|| nShape[who][G] > 0*/; }
-	int getShape4(int index, int piece) { return board[index].shape4[piece]; }
-	int getShape(int index, int piece, int i) { return board[index].shape[i][piece]; }
+	bool isExpand() { return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
@@ -52,9 +43,5 @@ public:
 	int min(int a, int b) { return a < b ? a : b; }
 	bool inBoard(int index) { return board[index].piece != OUTSIDE; }
 	int oppent(int piece) { return piece == BLACK ? WHITE : BLACK; }
-	string getShapeName(int index) { return ChessShape::getShapeName(index); }
-	string getShape4Name(int index) { return ChessShape::getShape4Name(index); }
 	string getPiece(int piece) { return piece == BLACK ? "黑" : "白"; }
-private:
-	const int MAX_SIZE = 28;
 };

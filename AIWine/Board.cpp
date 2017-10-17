@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "ChessShape.h"
 #include<assert.h>
+//初始化棋盘
 void Board::initBoard(int size)
 {
 	memset(board, 0, sizeof(board));
@@ -57,7 +58,6 @@ void Board::initBoard(int size)
 	upperLeft = makePoint(boardSize + 3, boardSize + 3);
 	lowerRight = makePoint(4,4);
 	memset(nShape, 0, sizeof(nShape));
-	memset(remShape, 0, sizeof(remShape));
 }
 //落子
 void Board::move(Point p)
@@ -102,7 +102,6 @@ void Board::move(Point p)
 				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
 				board[move_p].update4();
 				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
-				//remShape[0][board[move_p].shape4[0]] = move_p; remShape[1][board[move_p].shape4[1]] = move_p;
 			}
 		}
 		move_p = p;
@@ -117,7 +116,6 @@ void Board::move(Point p)
 				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
 				board[move_p].update4();
 				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
-				//remShape[0][board[move_p].shape4[0]] = move_p; remShape[1][board[move_p].shape4[1]] = move_p;
 			}
 		}
 	}
@@ -127,23 +125,11 @@ void Board::move(Point p)
 		board[p + RANGE[i]].neighbor++;
 	}
 	
-	
-	/*bool flag = check();
-	if (flag == false)
-	{
-		cout << "MESSAGE mowho为" + getPiece(pointPiece) << endl;
-		string whoName = getPiece(who) + ":";
-		string oppName = getPiece(opp) + ":";
-		cout << "MESSAGE" << " who:" << whoName << " opp:" << oppName << endl;
-		int p2 = makePoint(8, 13);
-		cout << "MESSAGE" << " failPoint:" << pointX(p) - 4 << "," << pointY(p) - 4 << endl;
-		cout << "MESSAGE" << " shape4:" <<whoName<< getShape4Name(board[p].shape4[who])<< oppName << getShape4Name(board[p].shape4[opp])<<"|"<<whoName<< getShape4Name(board[p2].shape4[who]) << oppName << getShape4Name(board[p2].shape4[opp]) << endl;
-		cout << "MESSAGE" << " nshape:" << nShape[who][A] << "," << nShape[opp][A] << endl;
-	}*/
 	assert(check());
 	who = oppent(who);
 	opp = oppent(opp);
 }
+//悔棋
 void Board::undo()
 {
 	assert(check());
@@ -162,7 +148,6 @@ void Board::undo()
 
 	nShape[0][chess->shape4[0]]++;
 	nShape[1][chess->shape4[1]]++;
-	assert(chess->piece == BLACK || chess->piece == WHITE);
 	chess->piece = EMPTY;
 
 	who = oppent(who);
@@ -183,7 +168,6 @@ void Board::undo()
 				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
 				board[move_p].update4();
 				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
-				//remShape[0][board[move_p].shape4[0]] = move_p; remShape[1][board[move_p].shape4[1]] = move_p;
 			}
 		}
 		move_p = p;
@@ -198,7 +182,6 @@ void Board::undo()
 				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
 				board[move_p].update4();
 				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
-				//remShape[0][board[move_p].shape4[0]] = move_p; remShape[1][board[move_p].shape4[1]] = move_p;
 			}
 		}
 	}
@@ -224,9 +207,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 				return;
 			}
 		}
-		/*nCand = 1;
-		cand[0].point = remShape[who][A];*/
-		return;
+		assert(false);
 	}
 	
 	if (nShape[opp][A] > 0)
@@ -240,9 +221,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 				return;
 			}
 		}
-		/*nCand = 1;
-		cand[0].point = remShape[opp][A];*/
-		return;
+		assert(false);
 	}
 	if (nShape[who][B] > 0)
 	{
@@ -255,9 +234,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 				return;
 			}
 		}
-		/*nCand = 1;
-		cand[0].point = remShape[who][B];*/
-		return;
+		assert(false);
 	}
 	if (nShape[opp][B] > 0)
 	{
@@ -269,9 +246,9 @@ void Board::generateCand(Cand cand[], int& nCand)
 				cand[nCand].value = board[i].prior(who);
 				cand[nCand].point = i;
 				if (cand[nCand].value >= 5) nCand++;
-				assert(nCand <= 256);
 			}
 		}
+		assert(nCand > 0 && nCand <= 256);
 		return;
 	}
 
@@ -283,8 +260,8 @@ void Board::generateCand(Cand cand[], int& nCand)
 			cand[nCand].value = board[i].prior(who);
 			cand[nCand].point = i;
 			if (cand[nCand].value > 0) nCand++;
-			assert(nCand <= 256);
 		}
+		assert(nCand <= 256);
 	}
 }
 //局面评估
@@ -305,6 +282,7 @@ int Board::evaluate()
 	}
 	return eval[who] - eval[opp];
 }
+//胜利局面搜索(将在几步内赢棋)
 int Board::quickWinSearch()
 {
 	int q;
@@ -316,7 +294,6 @@ int Board::quickWinSearch()
 		{
 			if (board[m].isCand()&& board[m].shape4[opp] == A)
 			{
-				/*int m = remShape[opp][A];*/
 				move(m);
 				q = -quickWinSearch();
 				undo();
@@ -340,7 +317,6 @@ int Board::quickWinSearch()
 				undo();
 				if (q > 0)
 				{
-					//cout << "MESSAGE" << " ply=" << ply << " who=" << who  << " point=" << pointX(m) - 4 << "," << pointY(m) - 4 << " 四三胜" << endl;
 					return q + 1;
 				}
 				
@@ -351,14 +327,12 @@ int Board::quickWinSearch()
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
 		{
-			/*int lastPoint = remPoint[chessCount - 1];
-			cout << "MESSAGE" << " ply=" << ply << " who=" << who << " lastPoint=" << pointX(lastPoint) - 4 << "," << pointY(lastPoint) - 4 << " 三三胜" << endl;*/
-
 			return 5;
 		}
 	}
 	return 0;
 }
+//vcf搜索
 int Board::vcfSearch()
 {
 	int q;
@@ -370,7 +344,6 @@ int Board::vcfSearch()
 		{
 			if (board[m].isCand() && board[m].shape4[opp] == A)
 			{
-				/*int m = remShape[opp][A];*/
 				move(m);
 				q = -quickWinSearch();
 				undo();
@@ -417,6 +390,7 @@ int Board::vcfSearch()
 		
 	return 0;
 }
+//获取所有空的点
 void Board::getEmptyCand(Cand cand[], int &nCand)
 {
 	for (int m = upperLeft; m < lowerRight; m++)
@@ -427,6 +401,7 @@ void Board::getEmptyCand(Cand cand[], int &nCand)
 		}
 	}
 }
+//检查棋型数量是否正确
 bool Board::check()
 {
 	int n[2][10] = { 0 };
@@ -442,7 +417,6 @@ bool Board::check()
 		for (int j = 1; j < 10; j++)
 			if (n[i][j] != nShape[i][j])
 			{
-				//cout << "MESSAGE" << " checkfail piece=" << getPiece(i) << " shape=" << getShape4Name(j) << endl;
 				return false;
 			}
 	return true;
