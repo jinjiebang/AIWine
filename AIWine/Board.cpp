@@ -1,6 +1,10 @@
 #include "Board.h"
 #include "ChessShape.h"
 #include<assert.h>
+Board::Board(HashTable* _hashTable)
+{
+	hashTable = _hashTable;
+}
 //初始化棋盘
 void Board::initBoard(int size)
 {
@@ -68,7 +72,7 @@ void Board::move(Point p)
 	nShape[0][board[p].shape4[0]]--;
 	nShape[1][board[p].shape4[1]]--;
 
-	int pointPiece = who;
+	hashTable->move(p, who);
 	
 	board[p].piece = who;
 	remChess[chessCount] = &board[p];
@@ -153,6 +157,8 @@ void Board::undo()
 	who = oppent(who);
 	opp = oppent(opp);
 
+	hashTable->move(p, who);
+
 	//更新位编码以及棋型信息
 	for (int k = 0; k < 4; k++)
 	{
@@ -236,26 +242,40 @@ void Board::generateCand(Cand cand[], int& nCand)
 		}
 		assert(false);
 	}
+
+	nCand = 0;
+	Point hashMove = -1;
+	if (hashTable->present() && hashTable->best() != 0 && hashTable->depth()>0)
+	{
+		hashMove = hashTable->best();
+		cand[0].point = hashMove;
+		cand[0].value = 10000;
+		nCand = 1;
+	}
+
 	if (nShape[opp][B] > 0)
 	{
 		nCand = 0;
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
-			if (board[i].isCand()&&(board[i].shape4[who] >= E || board[i].shape4[opp] >= E))
+			if (board[i].isCand() && i != hashMove)
 			{
-				cand[nCand].value = board[i].prior(who);
-				cand[nCand].point = i;
-				if (cand[nCand].value >= 5) nCand++;
+				if (board[i].shape4[who] >= E || board[i].shape4[opp] >= E)
+				{
+					cand[nCand].value = board[i].prior(who);
+					cand[nCand].point = i;
+					if (cand[nCand].value >= 5) nCand++;
+				}
 			}
 		}
 		assert(nCand > 0 && nCand <= 256);
 		return;
 	}
 
-	nCand = 0;
+	
 	for (int i = upperLeft; i <= lowerRight; i++)
 	{
-		if (board[i].isCand())
+		if (board[i].isCand() && i != hashMove)
 		{
 			cand[nCand].value = board[i].prior(who);
 			cand[nCand].point = i;

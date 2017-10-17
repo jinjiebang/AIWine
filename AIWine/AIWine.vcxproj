@@ -152,6 +152,7 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="Chess.h" />
     <ClInclude Include="ChessShape.h" />
+    <ClInclude Include="HashTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIWine.cpp" />

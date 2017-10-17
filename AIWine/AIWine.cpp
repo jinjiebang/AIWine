@@ -4,11 +4,13 @@
 
 AIWine::AIWine()
 {
-	board = new Board();
+	hashTable = new HashTable();
+	board = new Board(hashTable);
 	ChessShape::initShape();
 }
 AIWine::~AIWine()
 {
+	delete hashTable;
 	delete board;
 }
 //ÉèÖÃÆåÅÌ³ß´ç
@@ -174,6 +176,12 @@ int AIWine::search(int depth, int alpha, int beta)
 
 		}
 	}
+
+	q = hashTable->queryRecord(depth, alpha, beta);
+	if (q != HashTable::InvalidVal) return q;
+
+	int hash_flag = HASH_ALPHA;
+	Point best = 0;
 	Cand cand[MaxCand];
 	int nCand = 0;
 	board->generateCand(cand, nCand);
@@ -206,13 +214,20 @@ int AIWine::search(int depth, int alpha, int beta)
 
 		if (value >= beta)
 		{
+			if(!terminateAI) hashTable->update(beta, depth, HASH_BETA, cand[i].point);
 			return beta;
 		}
 		if (value > alpha)
 		{
+			hash_flag = HASH_EXACT;
+			best = cand[i].point;
 			alpha = value;
 		}
 		if (terminateAI) break;
+	}
+	if (!terminateAI)
+	{
+		hashTable->update(alpha, depth, hash_flag, best);
 	}
 	return alpha;
 }

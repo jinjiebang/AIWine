@@ -47,6 +47,6 @@ public:
 	int makePoint(int x, int y) { return (x << 5) + y; }
 	
 private:
-	Board *board;
-	
+	Board* board;
+	HashTable* hashTable;
 };
