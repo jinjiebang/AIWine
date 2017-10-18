@@ -204,7 +204,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 	//查询哈希表中的最佳点
 	nCand = 0;
 	Point hashMove = 0;
-	if (hashTable->present() && hashTable->best() != 0 && hashTable->depth() > 0)
+	if (hashTable->present() && hashTable->best() != 0)
 	{
 		hashMove = hashTable->best();
 		cand[0].point = hashMove;
@@ -276,7 +276,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		{
 			cand[nCand].value = board[i].prior(who);
 			cand[nCand].point = i;
-			if (cand[nCand].value > 0) nCand++;
+			if (cand[nCand].value >= 5) nCand++;
 		}
 		assert(nCand <= 256);
 	}

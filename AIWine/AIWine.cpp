@@ -64,7 +64,7 @@ void AIWine::turnBest(int &x, int &y)
 	board->generateCand(rootCand, nRootCand);
 	for (int depth = MinDepth; depth <=MaxDepth; depth++)
 	{
-		board->ply = 0, board->maxPly = 0, board->limitPly = depth + 8;
+		board->ply = 0, board->maxPly = 0, board->limitPly = depth + 20;
 		t0 = getTime();
 
 		best = rootSearch(depth, -10000, 10000);
@@ -148,15 +148,17 @@ int AIWine::search(int depth, int alpha, int beta)
 		if (getTime() - stopTime() > 0) terminateAI = true;
 	}
 	nSearched++;
-	int q = board->quickWinSearch();
-	if (q != 0)
-	{
-		return q > 0 ? 10000 : -10000;
-	}
+	int q;
+
+	q = hashTable->queryRecord(depth, alpha, beta);
+	if (q != HashTable::InvalidVal) return q;
+
+	q = board->quickWinSearch();
+	if (q != 0) return q > 0 ? 10000 : -10000;
 	if (depth <= 0)
 	{
 		int eval = board->evaluate();
-		if (eval>alpha && eval<beta)
+		if (eval>alpha)
 		{
 			if (board->isExpand())
 			{
@@ -164,10 +166,9 @@ int AIWine::search(int depth, int alpha, int beta)
 			}
 			else
 			{
-				/*q = board->vcfSearch();
+				q = board->vcfSearch();
 				if (q > 0) return 10000;
-				else return eval;*/
-				return eval;
+				else return eval;
 			}
 		}
 		else
@@ -176,9 +177,6 @@ int AIWine::search(int depth, int alpha, int beta)
 
 		}
 	}
-
-	q = hashTable->queryRecord(depth, alpha, beta);
-	if (q != HashTable::InvalidVal) return q;
 
 	int hash_flag = HASH_ALPHA;
 	Point best = 0;
