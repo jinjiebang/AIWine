@@ -35,11 +35,11 @@ public:
 				}
 				else if (currentItem->flag == HASH_ALPHA && currentItem->value <= alpha)
 				{
-					return currentItem->value;
+					return alpha;
 				}
 				else if (currentItem->flag== HASH_BETA && currentItem->value >= beta)
 				{
-					return currentItem->value;
+					return beta;
 				}
 			}
 		}
@@ -51,8 +51,9 @@ public:
 		HashItem* c = currentItem;
 		c->value = _value;
 		c->depth = _depth;
-		c->key = hashKey;
 		c->best = _best;
+		c->flag = _flag;
+		c->key = hashKey;
 	}
 	//更新当前局面的hashKey以及currentItem
 	void move(Point p, Piece who)

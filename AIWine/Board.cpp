@@ -201,7 +201,16 @@ void Board::undo()
 //生成所有分支
 void Board::generateCand(Cand cand[], int& nCand)
 {
-	
+	//查询哈希表中的最佳点
+	nCand = 0;
+	Point hashMove = 0;
+	if (hashTable->present() && hashTable->best() != 0 && hashTable->depth() > 0)
+	{
+		hashMove = hashTable->best();
+		cand[0].point = hashMove;
+		cand[0].value = 10000;
+		nCand = 1;
+	}
 	if (nShape[who][A] > 0) 
 	{ 
 		for (int i = upperLeft; i <= lowerRight; i++)
@@ -243,19 +252,8 @@ void Board::generateCand(Cand cand[], int& nCand)
 		assert(false);
 	}
 
-	nCand = 0;
-	Point hashMove = -1;
-	if (hashTable->present() && hashTable->best() != 0 && hashTable->depth()>0)
-	{
-		hashMove = hashTable->best();
-		cand[0].point = hashMove;
-		cand[0].value = 10000;
-		nCand = 1;
-	}
-
 	if (nShape[opp][B] > 0)
 	{
-		nCand = 0;
 		for (int i = upperLeft; i <= lowerRight; i++)
 		{
 			if (board[i].isCand() && i != hashMove)
@@ -272,7 +270,6 @@ void Board::generateCand(Cand cand[], int& nCand)
 		return;
 	}
 
-	
 	for (int i = upperLeft; i <= lowerRight; i++)
 	{
 		if (board[i].isCand() && i != hashMove)
