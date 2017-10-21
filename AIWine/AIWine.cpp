@@ -60,6 +60,7 @@ void AIWine::turnBest(int &x, int &y)
 		turnMove(x, y);
 		return;
 	}
+	int temp_best = rootBest.point;
 	nSearched = 0;
 	board->generateCand(rootCand, nRootCand);
 	for (int depth = MinDepth; depth <=MaxDepth; depth++)
@@ -74,6 +75,7 @@ void AIWine::turnBest(int &x, int &y)
 		showDepthInfo(depth, rootBest, td);
 		if (rootBest.value == 10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 	}
+	assert(temp_best != rootBest.point);
 	x = pointX(rootBest.point) - 4;
 	y = pointY(rootBest.point) - 4;
 	assert(isValidPos(x, y));
@@ -158,7 +160,7 @@ int AIWine::search(int depth, int alpha, int beta)
 	if (depth <= 0)
 	{
 		int eval = board->evaluate();
-		if (eval>alpha)
+		if (eval>alpha&&eval<beta)
 		{
 			if (board->isExpand())
 			{

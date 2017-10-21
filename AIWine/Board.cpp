@@ -297,7 +297,7 @@ int Board::evaluate()
 			eval[p] += ChessShape::shapePrior[c->pattern[k][p]][c->pattern[k][1 - p]];
 		}
 	}
-	return eval[who] - eval[opp];
+	return eval[who] - eval[opp] + 50;
 }
 //胜利局面搜索(将在几步内赢棋)
 int Board::quickWinSearch()
