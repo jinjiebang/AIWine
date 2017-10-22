@@ -4,6 +4,7 @@
 using namespace std;
 char ChessShape::shapeTable[256][256] = { 0 };
 short ChessShape::shapePrior[256][256] = { 0 };
+short ChessShape::shapeRank[256][256] = { 0 };
 char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
 //初始化棋形
 void ChessShape::initShape()
@@ -37,7 +38,11 @@ void ChessShape::initShape()
 	//初始化棋型等级表
 	for (int i = 0; i < 256; i++)
 		for (int j = 0; j < 256; j++)
+		{
 			shapePrior[i][j] = getShapePrior(i, j);
+			shapeRank[i][j] = getShapeRank(i, j);
+		}
+			
 		
 	//初始化组合棋形表
 	for (int i = 0; i < 10; i++)
@@ -121,7 +126,22 @@ UCHAR ChessShape::bitCount(UCHAR p)
 short ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 {
 	int score = 0;
-	int val[5] = { 1,4,9,16,25 };
+	int val[5] = { 1,4,9,16,25};
+	UCHAR shapeMask[5] = { 0xF0,0x78,0x3C,0x1E,0x0F };
+	for (int i = 0; i < 5; i++)
+	{
+		if ((p2&shapeMask[i]) == 0)
+		{
+			int cnt = bitCount(p1&shapeMask[i]);
+			score += val[cnt];
+		}
+	}
+	return score;
+}
+short ChessShape::getShapeRank(UCHAR p1, UCHAR p2)
+{
+	int score = 0;
+	int val[5] = { 3,7,11,15,19 };
 	UCHAR shapeMask[5] = { 0xF0,0x78,0x3C,0x1E,0x0F };
 	for (int i = 0; i < 5; i++)
 	{
@@ -136,7 +156,7 @@ short ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 //计算选点分值
 short ChessShape::calPrior(UCHAR pattern[4][2],int who)
 {
-	short v1= shapePrior[pattern[0][1]][pattern[0][0]] +shapePrior[pattern[1][1]][pattern[1][0]] +shapePrior[pattern[2][1]][pattern[2][0]] +shapePrior[pattern[3][1]][pattern[3][0]];
+	short v1 = shapePrior[pattern[0][1]][pattern[0][0]] + shapePrior[pattern[1][1]][pattern[1][0]] + shapePrior[pattern[2][1]][pattern[2][0]] + shapePrior[pattern[3][1]][pattern[3][0]];
 	short v0 = shapePrior[pattern[0][0]][pattern[0][1]] + shapePrior[pattern[1][0]][pattern[1][1]] + shapePrior[pattern[2][0]][pattern[2][1]] + shapePrior[pattern[3][0]][pattern[3][1]];
 	return who == 0 ? (v0 << 1) + v1 : (v1 << 1) + v0;
 }

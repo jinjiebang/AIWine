@@ -151,10 +151,6 @@ int AIWine::search(int depth, int alpha, int beta)
 	}
 	nSearched++;
 	int q;
-
-	q = hashTable->queryRecord(depth, alpha, beta);
-	if (q != HashTable::InvalidVal) return q;
-
 	q = board->quickWinSearch();
 	if (q != 0) return q > 0 ? 10000 : -10000;
 	if (depth <= 0)
@@ -178,6 +174,11 @@ int AIWine::search(int depth, int alpha, int beta)
 			return eval;
 
 		}
+	}
+	if (depth > 1 && alpha + 1 >= beta)
+	{
+		q = hashTable->queryRecord(depth, alpha, beta);
+		if (q != HashTable::InvalidVal) return q;
 	}
 
 	int hash_flag = HASH_ALPHA;

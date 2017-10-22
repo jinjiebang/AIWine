@@ -294,7 +294,7 @@ int Board::evaluate()
 		assert(p == BLACK || p == WHITE);
 		for (int k = 0; k < 4; k++)
 		{
-			eval[p] += ChessShape::shapePrior[c->pattern[k][p]][c->pattern[k][1 - p]];
+			eval[p] += ChessShape::shapeRank[c->pattern[k][p]][c->pattern[k][1 - p]];
 		}
 	}
 	return eval[who] - eval[opp] + 50;

@@ -10,6 +10,7 @@ public:
 	static short calPrior(UCHAR pattern[4][2],int who);
 	static char shapeTable[256][256];	//棋型表
 	static short shapePrior[256][256];	//棋型等级表
+	static short shapeRank[256][256];	//棋型估值表
 	static char fourShapeTable[10][10][10][10];//组合棋形表
 	
 private:
@@ -19,6 +20,7 @@ private:
 	static int linePiece(UCHAR p1, UCHAR p2, UCHAR mask) { return ((p1&mask ? 1 : 0) << 1) + (p2&mask ? 1 : 0); }
 	static void putStone(UCHAR &p1, UCHAR &p2, UCHAR mask) { p1 |= mask; p2 &= ~mask; }
 	static short getShapePrior(UCHAR p1, UCHAR p2);
+	static short getShapeRank(UCHAR p1, UCHAR p2);
 	static UCHAR bitCount(UCHAR p);
 };
 
