@@ -21,9 +21,6 @@ bool AIWine::setSize(int size)
 		return false;
 	}
 	board->initBoard(size);
-	//设置默认步时和局时(毫秒)
-	/*if (timeout_turn == 0) timeout_turn = 10000;
-	if (timeout_match == 0) timeout_match = 240000;*/
 	return true;
 }
 //重新开始
