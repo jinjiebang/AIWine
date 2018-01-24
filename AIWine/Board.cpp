@@ -99,13 +99,20 @@ void Board::move(Point p)
 		for (UCHAR m = 16; m != 0; m <<= 1)
 		{
 			move_p -= MOV[k];
+			int x = pointX(move_p) - 4;
+			int y = pointY(move_p) - 4;
+			//printf("点(%d,%d)\n", x, y);
 			board[move_p].pattern[k][who] |= m;
 			if (board[move_p].piece == EMPTY)
 			{
 				board[move_p].update1(k);
 				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
+				
 				board[move_p].update4();
-				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
+				int a = board[move_p].shape4[0];
+				int b = board[move_p].shape4[1];
+				//printf("点(%d,%d)的棋型是黑：%d 白：%d\n",x,y,a,b);
+				nShape[0][a]++; nShape[1][b]++;
 			}
 		}
 		move_p = p;

@@ -157,7 +157,118 @@ int gomocup()
 	}
 	delete ai;
 }
+void drawBoard(int board[15][15])
+{
+	for (int i = 0; i < 15; i++)
+	{
+		for (int j = 0; j < 15; j++)
+		{
+			//行首输出行号
+			if (j == 0)
+			{
+				if (i + 1 < 10)
+				{
+					cout << " ";
+				}
+				cout << i + 1;
+			}
+			//输出棋盘内容
+			switch (board[i][j])
+			{
+			case 0:
+				if (i == 0)
+				{
+					if (j == 0)
+					{
+						cout << "┌";
+					}
+					else if (j == 14)
+					{
+						cout << "┐";
+					}
+					else
+					{
+						cout << "┬";
+					}
+				}
+				else if (i == 14)
+				{
+					if (j == 0)
+					{
+						cout << "└";
+					}
+					else if (j == 14)
+					{
+						cout << "┘";
+					}
+					else
+					{
+						cout << "┴";
+					}
+				}
+				else
+				{
+					if (j == 0)
+					{
+						cout << "├";
+					}
+					else if (j == 14)
+					{
+						cout << "┤";
+					}
+					else
+					{
+						cout << "┼";
+					}
+				}
+				break;
+			case 1:
+				cout << "●";
+				break;
+			case 2:
+				cout << "○";
+				break;
+
+			}
+		}
+		//行末换行
+		cout << endl;
+	}
+	cout << "  A B C D E F G H I J K L M N O" << endl;
+
+}
+void simpleUI()
+{
+	bool exit = false;
+	int color = 1;
+	int board[15][15] = { 0 };
+	AIWine* ai = new AIWine();
+	ai->setSize(15);
+	do
+	{
+		cout << "请输入下棋坐标(如h8):" << endl;
+		string inputStr("");
+		cin >> inputStr;
+		int x, y;
+		if (inputStr.length() == 2)
+		{
+			x = inputStr[0] - 'a';
+			y = inputStr[1] - '1';
+		}
+		else if (inputStr.length() == 3)
+		{
+			x = inputStr[0] - 'a';
+			y = (inputStr[1] - '0') * 10 + inputStr[2] - '1';
+		}
+		ai->turnMove(x, y);
+		board[x][y] = color;
+		color = 3 - color;
+		drawBoard(board);
+	} while (!exit);
+	delete ai;
+}
 int main()
 {
 	gomocup();
+	//simpleUI();
 }

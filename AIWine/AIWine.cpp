@@ -22,8 +22,8 @@ bool AIWine::setSize(int size)
 	}
 	board->initBoard(size);
 	//设置默认步时和局时(毫秒)
-	if (timeout_turn == 0) timeout_turn = 10000;
-	if (timeout_match == 0) timeout_match = 240000;
+	/*if (timeout_turn == 0) timeout_turn = 10000;
+	if (timeout_match == 0) timeout_match = 240000;*/
 	return true;
 }
 //重新开始
@@ -63,6 +63,8 @@ void AIWine::turnBest(int &x, int &y)
 		turnMove(x, y);
 		return;
 	}
+	if (timeout_turn == 0) timeout_turn = 10000;
+	if (timeout_match == 0) timeout_match = time_left = 1000000;
 	int temp_best = rootBest.point;
 	nSearched = 0;
 	board->generateCand(rootCand, nRootCand);
