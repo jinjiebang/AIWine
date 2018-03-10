@@ -451,17 +451,32 @@ void Board::getAllPoint(Point point[], int &nPoint)
 }
 int Board::vctSearch(int *winPoint)
 {
-	for (int depth = 6; depth <= MAX_VCT_DEPTH; depth+=2)
+	t_VCT_Start = getTime();
+	vctNode = 0;
+	vctStop = false;
+	for (int depth = 10; depth <= MAX_VCT_DEPTH; depth+=2)
 	{
-		int result=vctSearch(who,0, depth, 0,winPoint);
+		if (getTime() - t_VCT_Start > 1000)
+		{
+			cout << "MESSAGE VCT停止层数："<<depth<<"节点数："<<vctNode << endl;
+			return 0;
+		}
+		int result = vctSearch(who, 0, depth, 0, 0, winPoint); 
 		if (result > 0) return result;
 	}
 	return 0;
 }
 //VCT搜索
-int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* winPoint)
+int Board::vctSearch(int searcher,int depth,int maxDepth,int lastFlex3,int defendFour,int* winPoint)
 {
-	if (depth > maxDepth) return 0;
+	if (depth > maxDepth|| vctStop) return 0;
+	static int cnt;
+	if (--cnt<0)
+	{
+		cnt = 1000;
+		if (getTime() - t_VCT_Start > 1000) vctStop=true;
+	}
+	vctNode++;
 	int q;
 	//本方能成五
 	if (nShape[who][A] >= 1)
@@ -471,16 +486,14 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 	}
 	if (nShape[opp][A] >= 2) return -2;
 	//对方下一步能成五，挡在成五点
-	int newDefendFour=denfendFour;
 	if (nShape[opp][A] == 1)
 	{
-		newDefendFour = who == searcher ? denfendFour : 0;
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
 			if (board[m].isCand() && board[m].shape4[opp] == A)
 			{
 				move(m);
-				q = -vctSearch(searcher,depth+1,maxDepth, newDefendFour,winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastFlex3, defendFour,winPoint);
 				undo();
 				if (q < 0) q--; 
 				else if (q > 0)
@@ -499,22 +512,49 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 		if (depth == 0) *winPoint = findPoint(who, B);
 		return 3;
 	}
-	//本方有冲四活三，尝试
-	if (nShape[who][C] >= 1)
+	//对方是算杀方且能活四，防守
+	if (who != searcher&&nShape[opp][B] >= 1)
 	{
-		if (who != searcher&&denfendFour>=MAX_DEFNED_FOUR) return 0;
+		int max_q = -1000;
+		int newDefendFour = defendFour;
+		for (int m = upperLeft; m <= lowerRight; m++)
+		{
+			if (board[m].isCand() && (board[m].shape4[opp] >= E||board[m].shape4[who]>=E))
+			{
+				
+				newDefendFour = (board[m].shape4[who] >= E) ? defendFour + 1 : defendFour;
+				//算杀方有活三时，防守方的冲四数量有限制
+				if (newDefendFour > MAX_DEFNED_FOUR){
+					q = 0;
+				}else {
+					move(m);
+					q = -vctSearch(searcher, depth + 1, maxDepth, lastFlex3, newDefendFour, winPoint);
+					undo();
+				}
+				if (q > 0)
+				{
+					if (depth == 0) *winPoint = m;
+					return q + 1;//有个防守点能赢，就算赢
+				}
+				else if (q > max_q) max_q = q;
+			}
+		}
+		return max_q;//q>0时，会提前返回，剩下的情况，如果等于0，返回0，否则返回最大的q值，所以直接返回max_q即可
+	}
+	//本方是算杀方，有冲四活三，尝试
+	if (who==searcher&&nShape[who][C] >= 1)
+	{
 		//对方没有能成四的点，五步胜利
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
 		{
 			if (depth > 0) return 5;
 		}
-		newDefendFour = who == searcher ? denfendFour : denfendFour + 1;
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, newDefendFour, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastFlex3, defendFour, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -525,21 +565,19 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 			}
 		}
 	}
-	
-	Point whoLast = remPoint[chessCount - 2];		//本方最后一步棋位置
-	//单独的冲四或者冲四带一个活二或眠三，也就是包含了所有冲四点（除掉冲四活三)
-	if(nShape[who][D] >= 1 || nShape[who][E] >= 1)
+	//当前方最后一步棋位置
+	Point whoLast = remPoint[chessCount - 2];		
+	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
+	if(who==searcher&&(nShape[who][D] >= 1 || nShape[who][E] >= 1))
 	{
-		if (who != searcher&&denfendFour>=MAX_DEFNED_FOUR) return 0;
-		newDefendFour = who == searcher ? denfendFour : denfendFour + 1;
-		if (depth == 0 || who!=searcher)//防守时或第一步要尝试所有点
+		if (depth == 0)//第一步要尝试所有点
 		{
 			for (int m = upperLeft; m < lowerRight; m++)
 			{
 				if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 				{
 					move(m);
-					q = -vctSearch(searcher, depth + 1, maxDepth, newDefendFour, winPoint);
+					q = -vctSearch(searcher, depth + 1, maxDepth, lastFlex3, defendFour, winPoint);
 					undo();
 					if (q > 0)
 					{
@@ -558,7 +596,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 					if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 					{
 						move(m);
-						q = -vctSearch(searcher, depth + 1, maxDepth, newDefendFour, winPoint);
+						q = -vctSearch(searcher, depth + 1, maxDepth, lastFlex3, defendFour, winPoint);
 						undo();
 						if (q > 0) return q + 1;
 					}
@@ -567,28 +605,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 		}
 		
 	}
-	//对方能成活四,防守,
-	if (who != searcher&&nShape[opp][B] >= 1)
-	{
-		int max_q = -1000;
-		
-		for (int m = upperLeft; m <= lowerRight; m++)
-		{
-			if (board[m].isCand() && board[m].shape4[opp] >= E)
-			{
-				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, 0, winPoint);
-				undo();
-				if (q > 0)
-				{
-					if (depth == 0) *winPoint = m;
-					return q + 1;//有个防守点能赢，就算赢
-				}
-				else if (q > max_q) max_q = q;
-			}
-		}
-		return max_q;//q>0时，会提前返回，剩下的情况，如果等于0，返回0，否则返回最大的q值，所以直接返回max_q即可
-	}
+	
 	
 	//本方能成双活三，对方没有任何冲四或活四,五步胜利
 	if (who == searcher&&nShape[who][F] >= 1)
@@ -611,7 +628,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 				if (board[m].isCand() && board[m].shape4[who] >= G && board[m].shape4[who] <= F)
 				{
 					move(m);
-					q = -vctSearch(searcher, depth + 1, maxDepth, denfendFour, winPoint);
+					q = -vctSearch(searcher, depth + 1, maxDepth, m, defendFour, winPoint);
 					undo();
 					if (q > 0)
 					{
@@ -623,7 +640,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 		}
 		else
 		{
-			if (chessCount - 2 - denfendFour > 0) whoLast = remPoint[chessCount - 2 - denfendFour];
+			if (lastFlex3 > 0) whoLast = lastFlex3;
 			//后续算杀只考虑4格内的点，防止爆炸
 			for (int offsetX = -4; offsetX <= 4; offsetX++)
 			{
@@ -633,7 +650,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int denfendFour,int* wi
 					if (board[m].isCand() && board[m].shape4[who] >= G&&board[m].shape4[who] <= F)
 					{
 						move(m);
-						q = -vctSearch(searcher, depth + 1, maxDepth, denfendFour, winPoint);
+						q = -vctSearch(searcher, depth + 1, maxDepth, m, defendFour, winPoint);
 						undo();
 						if (q > 0) return q + 1;
 					}

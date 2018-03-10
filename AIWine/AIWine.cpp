@@ -80,7 +80,7 @@ void AIWine::turnBest(int &x, int &y)
 
 			t1 = getTime(); td = t1 - t0;
 			showDepthInfo(depth, rootBest, td);
-			if (rootBest.value == 10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
+			if (rootBest.value == 10000 || rootBest.value == -10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 		}
 		assert(temp_best != rootBest.point);
 	}
