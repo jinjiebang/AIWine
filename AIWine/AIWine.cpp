@@ -37,7 +37,7 @@ void AIWine::turnUndo()
 void AIWine::showDepthInfo(int depth,Cand best, long td)
 {
 	cout << "MESSAGE depth: " << depth << "-" << board->maxPly
-		<< " [" << pointX(best.point) - 4 << "," << pointY(best.point) - 4 << "]"
+		<< " best:[" << pointX(best.point) - 4 << "," << pointY(best.point) - 4 << "]"
 		<< " val=" << best.value << " time:" << td << "ms" << endl;
 }
 //落子
@@ -64,20 +64,34 @@ void AIWine::turnBest(int &x, int &y)
 	if (timeout_match == 0) timeout_match = time_left = 1000000;
 	int temp_best = rootBest.point;
 	nSearched = 0;
-	board->generateCand(rootCand, nRootCand);
-	for (int depth = MinDepth; depth <=MaxDepth; depth++)
+
+	//先算vct
+	int vct_result = board->vctSearch(&rootBest.point);
+	//如果没有算到杀
+	if (vct_result <= 0)
 	{
-		board->ply = 0, board->maxPly = 0, board->limitPly = depth + 20;
-		t0 = getTime();
+		board->generateCand(rootCand, nRootCand);
+		for (int depth = MinDepth; depth <= MaxDepth; depth++)
+		{
+			t0 = getTime();
 
-		best = rootSearch(depth, -10000, 10000);
-		if (best.point != 0) rootBest = best;
+			best = rootSearch(depth, -10000, 10000);
+			if (best.point != 0) rootBest = best;
 
-		t1 = getTime(); td = t1 - t0;
-		showDepthInfo(depth, rootBest, td);
-		if (rootBest.value == 10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
+			t1 = getTime(); td = t1 - t0;
+			showDepthInfo(depth, rootBest, td);
+			if (rootBest.value == 10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
+		}
+		assert(temp_best != rootBest.point);
 	}
-	assert(temp_best != rootBest.point);
+	else 
+	{
+		x = pointX(rootBest.point) - 4;
+		y = pointY(rootBest.point) - 4;
+		cout << "MESSAGE vct算杀成功！ 必胜点["<<x<<","<<y<<"]"<< endl;
+		
+	}
+	
 	x = pointX(rootBest.point) - 4;
 	y = pointY(rootBest.point) - 4;
 	assert(isValidPos(x, y));
@@ -86,6 +100,7 @@ void AIWine::turnBest(int &x, int &y)
 //根节点搜索
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
 {
+	board->ply = 0, board->maxPly = 0;
 	if(depth>MinDepth)
 	{
 		delLoseCand(rootCand, nRootCand);
@@ -152,36 +167,25 @@ int AIWine::search(int depth, int alpha, int beta)
 		if (getTime() - stopTime() > 0) terminateAI = true;
 	}
 	nSearched++;
-	int q;
-	q = board->quickWinSearch();
+	//简单胜
+	int q = board->quickWinSearch();
 	if (q != 0) return q > 0 ? 10000 : -10000;
+	//到达叶节点
 	if (depth <= 0)
 	{
 		int eval = board->evaluate();
-		if (eval>alpha&&eval<beta)
-		{
-			if (board->isExpand())
+		if (eval>alpha&&eval<beta){
+			/*if (board->isExpand())
 			{
 				depth++;
-			}
-			else
-			{
-				q = board->vcfSearch();
-				if (q > 0) return 10000;
-				else return eval;
-			}
-		}
-		else
-		{
+			}else {*/
+				return board->vcfSearch(board->who,0) > 0 ? 10000 : eval;
+			//}
+		}else{
 			return eval;
-
 		}
 	}
-	if (depth > 1 && alpha + 1 >= beta)
-	{
-		q = hashTable->queryRecord(depth, alpha, beta);
-		if (q != HashTable::InvalidVal) return q;
-	}
+	if ((q = hashTable->queryRecord(depth, alpha, beta)) != HashTable::InvalidVal) return q;
 
 	int hash_flag = HASH_ALPHA;
 	Point best = 0;
