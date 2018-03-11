@@ -572,7 +572,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 		//对方没有能成四的点，五步胜利
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
 		{
-			if (depth == 0) *winPoint = findPoint(who, B);
+			if (depth == 0) *winPoint = findPoint(who, C);
 			return 5;
 		}
 		for (int m = upperLeft; m < lowerRight; m++)
