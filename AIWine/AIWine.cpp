@@ -89,7 +89,7 @@ void AIWine::turnBest(int &x, int &y)
 		x = pointX(rootBest.point) - 4;
 		y = pointY(rootBest.point) - 4;
 		cout << "MESSAGE vct算杀成功！ 必胜点["<<x<<","<<y<<"]"<< endl;
-		
+
 	}
 	
 	x = pointX(rootBest.point) - 4;
