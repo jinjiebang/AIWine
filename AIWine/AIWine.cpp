@@ -65,10 +65,21 @@ void AIWine::turnBest(int &x, int &y)
 	int temp_best = rootBest.point;
 	nSearched = 0;
 
-	//先算vct
-	int vct_result = board->vctSearch(&rootBest.point);
+	bool isSolved = false;
+	//先算vcf
+	if (board->vcfSearch(board->who, 0, &rootBest.point) > 0)
+	{
+		isSolved = true;
+		cout << "MESSAGE VCF算杀成功！必胜点["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
+	}
+	//再算vct
+	if (!isSolved&&board->vctSearch(&rootBest.point) > 0)
+	{
+		isSolved = true;
+		cout << "MESSAGE VCT算杀成功！必胜点[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
+	}
 	//如果没有算到杀
-	if (vct_result <= 0)
+	if (!isSolved)
 	{
 		board->generateCand(rootCand, nRootCand);
 		for (int depth = MinDepth; depth <= MaxDepth; depth++)
@@ -83,13 +94,6 @@ void AIWine::turnBest(int &x, int &y)
 			if (rootBest.value == 10000 || rootBest.value == -10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 		}
 		assert(temp_best != rootBest.point);
-	}
-	else 
-	{
-		x = pointX(rootBest.point) - 4;
-		y = pointY(rootBest.point) - 4;
-		cout << "MESSAGE vct算杀成功！ 必胜点["<<x<<","<<y<<"]"<< endl;
-
 	}
 	
 	x = pointX(rootBest.point) - 4;

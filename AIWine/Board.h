@@ -27,8 +27,9 @@ public:
 	const int MAX_VCF_DEPTH = 10;			//最大vcf深度
 	const int MAX_VCT_DEPTH = 12;			//最大vct深度
 	const int MAX_DEFNED_FOUR = 6;			//vct算杀时，算杀方有活三时，防守方最多能冲几个四
+	const int MAX_VCT_TIME = 1000;			//VCT时间(毫秒）
 	int Range4[32];							//4格内的米字范围
-	int Range3[24];							//3格内的米字范围
+	int Range3[32];							//3格内的米字范围和八卦点
 	
 	Board(HashTable* _hashTable);
 	void initBoard(int size);
@@ -39,11 +40,11 @@ public:
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
 	int quickWinSearch();
+	int vcfSearch(int searcher, int depth,int *winPoint);
 	int vcfSearch(int searcher,int depth);
 	int vctSearch(int searcher,int depth,int maxDepth,int lastThree,int lastThree2,int *winPoint);
 	int vctSearch(int *winPoint);
 	Point findPoint(Piece piece, FourShape shape);
-	void getAllPoint(Point point[], int &nPoint);
 
 	//内联方法
 	bool isExpand() { return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0; }
