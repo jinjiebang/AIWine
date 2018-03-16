@@ -82,6 +82,23 @@ void AIWine::turnBest(int &x, int &y)
 	if (!isSolved)
 	{
 		board->generateCand(rootCand, nRootCand);
+		for (int i = 0; i < nRootCand; i++)
+		{
+			board->move(rootCand[i].point);
+			int lastPoint = board->findLastPoint();
+			int winPoint = 0;
+			bool vctLose = false;
+			if (lastPoint != -1&& board->vctSearch(board->who, 0, 10, lastPoint, &winPoint)>0)
+			{
+				vctLose = true;
+			}
+			board->undo();
+			if (vctLose)
+			{
+				rootCand[i].value = -10000;
+				delLoseCand(rootCand, nRootCand);
+			}
+		}
 		for (int depth = MinDepth; depth <= MaxDepth; depth++)
 		{
 			t0 = getTime();
@@ -178,11 +195,7 @@ int AIWine::search(int depth, int alpha, int beta)
 	if (depth <= 0)
 	{
 		int eval = board->evaluate();
-		if (eval>alpha&&eval<beta){
-			/*if (board->isExpand())
-			{
-				depth++;
-			}else {*/
+		if (eval>alpha&&eval<beta) {
 			int lastPoint = board->findLastPoint();
 			if (lastPoint == -1)
 			{
@@ -192,8 +205,8 @@ int AIWine::search(int depth, int alpha, int beta)
 			{
 				return board->vcfSearch(board->who, 0, lastPoint) > 0 ? 10000 : eval;
 			}
-			//}
-		}else{
+		}
+		else {
 			return eval;
 		}
 	}

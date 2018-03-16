@@ -50,7 +50,7 @@ public:
 	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀
 
 	//内联方法
-	bool isExpand() { return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0; }
+	bool isExpand() { return nShape[opp][A] > 0; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
