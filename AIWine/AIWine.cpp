@@ -67,7 +67,7 @@ void AIWine::turnBest(int &x, int &y)
 
 	bool isSolved = false;
 	//先算vcf
-	if (board->vcfSearch(board->who, 0, &rootBest.point) > 0)
+	if (board->vcfSearch(&rootBest.point) > 0)
 	{
 		isSolved = true;
 		cout << "MESSAGE VCF算杀成功！必胜点["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
@@ -183,7 +183,15 @@ int AIWine::search(int depth, int alpha, int beta)
 			{
 				depth++;
 			}else {*/
-				return board->vcfSearch(board->who,0) > 0 ? 10000 : eval;
+			int lastPoint = board->findLastPoint();
+			if (lastPoint == -1)
+			{
+				return eval;
+			}
+			else
+			{
+				return board->vcfSearch(board->who, 0, lastPoint) > 0 ? 10000 : eval;
+			}
 			//}
 		}else{
 			return eval;
@@ -245,7 +253,7 @@ int AIWine::search(int depth, int alpha, int beta)
 //删除必败点
 void AIWine::delLoseCand(Cand cand[], int &nCand)
 {
-	for (int i = 0; i < nCand; i++)
+	for (int i = nCand - 1; i >= 0; i--)
 	{
 		if (cand[i].value == -10000)
 		{

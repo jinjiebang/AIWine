@@ -105,10 +105,12 @@ int ChessShape::getFourShape(int s1, int s2, int s3, int s4)
 	if (n[BLOCK4] >= 1 && n[FLEX3] >= 1) return C;		// XOOO_ * _OO
 	if (n[BLOCK4] >= 1 && n[BLOCK3] >= 1) return D;		// XOOO_ * _OOX
 	if (n[BLOCK4] >= 1 && n[FLEX2] >= 1) return D;		// XOOO_ * _O
+	if (n[BLOCK4] >= 1 && n[BLOCK2] >= 1) return D;		// XOOO_ * _OX
 	if (n[BLOCK4] >= 1) return E;						// XOOO_
 	if (n[FLEX3] >= 2) return F;						// OO_ * _OO
 	if (n[FLEX3] >= 1 && n[BLOCK3] >= 1) return G;		// OO_ * _OOX
 	if (n[FLEX3] >= 1 && n[FLEX2] >= 1) return G;		// OO_ * _O
+	if (n[FLEX3] >= 1 && n[BLOCK2] >= 1) return G;		// OO_ * _OX
 	if (n[FLEX3] >= 1) return H;						// OO_
 
 	return 0;

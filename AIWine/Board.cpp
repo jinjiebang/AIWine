@@ -165,7 +165,7 @@ void Board::move(Point p)
 	who = oppent(who);
 	opp = oppent(opp);
 }
-//悔棋
+//提子
 void Board::undo()
 {
 	assert(check());
@@ -380,8 +380,19 @@ int Board::quickWinSearch()
 	}
 	return 0;
 }
+int Board::vcfSearch(int *winPoint)
+{
+	Point lastPoint = findLastPoint();
+	if (lastPoint == -1) return 0;
+	long vcf_start = getTime();
+	vcfNode = 0;
+	int result = vcfSearch(who, 0, lastPoint, winPoint);
+	long vcfTime = getTime() - vcf_start;
+	cout << "MESSAGE VCF花费时间：" << vcfTime << "ms 节点数：" << vcfNode << endl;
+	return result;
+}
 //vcf搜索
-int Board::vcfSearch(int searcher,int depth)
+int Board::vcfSearch(int searcher,int depth,int lastPoint)
 {
 	int q;
 	if (nShape[who][A] >= 1) return 1;
@@ -394,7 +405,7 @@ int Board::vcfSearch(int searcher,int depth)
 			if (board[m].isCand() && board[m].shape4[opp] == A)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1);
+				q = -vcfSearch(searcher, depth + 1,lastPoint);
 				undo();
 				if (q < 0) q--; else if (q > 0) q++;
 				return q;
@@ -413,24 +424,23 @@ int Board::vcfSearch(int searcher,int depth)
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1);
+				q = -vcfSearch(searcher, depth + 1, m);
 				undo();
 				if (q > 0) return q + 1;
 
 			}
 		}
 	}
-	//冲四和活二或眠三搭配
-	if (who==searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1&&chessCount>=2)
+	//本方有冲四和其他棋型(活二、眠三、眠二中的一個)
+	if (who==searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1)
 	{
-		Point whoLast = remPoint[chessCount - 2];
 		for (int r:Range4)
 		{
-			int m = whoLast + r;
+			int m = lastPoint + r;
 			if (board[m].isCand() && board[m].shape4[who] == D)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1);
+				q = -vcfSearch(searcher, depth + 1, m);
 				undo();
 				if (q > 0) return q + 1;
 			}
@@ -443,10 +453,12 @@ int Board::vcfSearch(int searcher,int depth)
 	}
 	return 0;
 }
+
 //vcf搜索
-int Board::vcfSearch(int searcher, int depth,int *winPoint)
+int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 {
 	int q;
+	vcfNode++;
 	if (nShape[who][A] >= 1)
 	{
 		if (depth == 0) *winPoint = findPoint(who, A);
@@ -461,7 +473,7 @@ int Board::vcfSearch(int searcher, int depth,int *winPoint)
 			if (board[m].isCand() && board[m].shape4[opp] == A)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1,winPoint);
+				q = -vcfSearch(searcher, depth + 1,lastPoint,winPoint);
 				undo();
 				if (q < 0) q--; 
 				else if (q > 0)
@@ -493,7 +505,7 @@ int Board::vcfSearch(int searcher, int depth,int *winPoint)
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1, winPoint);
+				q = -vcfSearch(searcher, depth + 1,m, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -503,17 +515,16 @@ int Board::vcfSearch(int searcher, int depth,int *winPoint)
 			}
 		}
 	}
-	//冲四和活二或眠三搭配
-	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1 && chessCount >= 2)
+	//本方有冲四和其他棋型(活二、眠三、眠二中的一個)
+	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1)
 	{
-		Point whoLast = remPoint[chessCount - 2];
 		for (int r : Range4)
 		{
-			int m = whoLast + r;
+			int m = lastPoint + r;
 			if (board[m].isCand() && board[m].shape4[who] == D)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1, winPoint);
+				q = -vcfSearch(searcher, depth + 1,m, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -545,6 +556,18 @@ Point Board::findPoint(Piece piece, FourShape shape)
 	}
 	return -1;
 }
+Point Board::findLastPoint()
+{
+	if (chessCount < 2) return -1;
+	for (int i = chessCount - 2; i >= 0; i -= 2)
+	{
+		if (remChess[i]->shape[0][who] >= FLEX2 || remChess[i]->shape[1][who] >= FLEX2 || remChess[i]->shape[2][who] >= FLEX2 || remChess[i]->shape[3][who] >= FLEX2)
+		{
+			return remPoint[i];
+		}
+	}
+	return -1;
+}
 int Board::vctSearch(int *winPoint)
 {
 	t_VCT_Start = getTime();
@@ -552,19 +575,11 @@ int Board::vctSearch(int *winPoint)
 	vctStop = false;
 	int result = 0;
 	int depth;
-	Point lastPoint = -1;
-	for (int i = chessCount - 2; i >= 0; i-=2)
-	{
-		if (remChess[i]->shape[0][who] >= FLEX2 || remChess[i]->shape[1][who] >= FLEX2 || remChess[i]->shape[2][who] >= FLEX2|| remChess[i]->shape[3][who] >= FLEX2)
-		{
-			lastPoint = remPoint[i];
-			break;
-		}
-	}
+	Point lastPoint = findLastPoint();
 	if (lastPoint == -1) return 0;
 	for (depth = 8; depth <= MAX_VCT_DEPTH; depth+=2)
 	{
-		result = vctSearch(who, 0, depth,lastPoint,0, winPoint); 
+		result = vctSearch(who, 0, depth, lastPoint, winPoint);
 		if (result > 0||vctStop)
 		{
 			break;
@@ -576,7 +591,7 @@ int Board::vctSearch(int *winPoint)
 }
 
 //VCT搜索
-int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int lastThree2,int* winPoint)
+int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winPoint)
 {
 	if (depth > maxDepth|| vctStop) return 0;
 	static int cnt;
@@ -605,7 +620,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 			if (board[m].isCand() && board[m].shape4[opp] == A)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastThree, lastThree2, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
 				undo();
 				if (q < 0) q--; 
 				else if (q > 0)
@@ -633,7 +648,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 			if (board[m].isCand() && (board[m].shape4[opp] >= E||board[m].shape4[who]>=E))
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastThree, lastThree2, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -660,7 +675,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastThree, lastThree2, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m,winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -670,32 +685,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 
 			}
 		}
-	}
-	//当前方上一步棋位置
-	Point whoLast = remPoint[chessCount - 2];		
-	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
-	if(who==searcher&&nShape[who][D] > 0)
-	{
-		//后续算杀只考虑米字范围，防止vct爆炸
-		for (int r:Range4)
-		{
-			int m = whoLast + r;
-			if (board[m].isCand() && board[m].shape4[who] == D)
-			{
-				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastThree, lastThree2, winPoint);
-				undo();
-				if (q > 0)
-				{
-					if (depth == 0) *winPoint = m;
-					return q + 1;
-				}
-					
-			}
-		}
-	}
-	
-	
+	}	
 	//攻击方尝试双活三
 	if (who == searcher&&nShape[who][F]>0)
 	{
@@ -709,7 +699,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 			if (board[m].isCand() && board[m].shape4[who] == F)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, m, lastThree, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -719,19 +709,39 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastThree, int last
 			}
 		}
 	}
-
-	//尝试活三带活二或眠三
-	if (who== searcher&&chessCount >= 2 && nShape[who][G] >= 1)
+	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
+	if(who==searcher&&nShape[who][D] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
-		if (lastThree > 0) whoLast = lastThree;
+		for (int r:Range4)
+		{
+			int m = lastPoint + r;
+			if (board[m].isCand() && board[m].shape4[who] == D)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
+				undo();
+				if (q > 0)
+				{
+					if (depth == 0) *winPoint = m;
+					return q + 1;
+				}
+					
+			}
+		}
+	}
+	
+	//尝试活三加其他棋型
+	if (who== searcher && nShape[who][G] >= 1)
+	{
+		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r:Range3)
 		{
-			int m = whoLast +r;
+			int m = lastPoint +r;
 			if (board[m].isCand() && board[m].shape4[who] == G)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, m,lastThree, winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
 				undo();
 				if (q > 0)
 				{
