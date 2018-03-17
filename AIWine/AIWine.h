@@ -16,6 +16,8 @@ public:
 	static const int MaxDepth = 50;
 	static const int MinDepth = 2;
 	static const int MaxCand = 256;
+	static const int WinScore = 10000;
+	static const int LoseScore = -10000;
 
 	void restart();
 	void turnUndo();
@@ -37,7 +39,8 @@ public:
 	long start_time;						//开始时间
 	bool terminateAI;						//停止搜索标志
 
-	void delLoseCand(Cand cand[],int &nCand);
+	void delLoseCand();
+	void delVctLose();
 	void sortCand(Cand cand[], int nCand);
 	void showDepthInfo(int depth, Cand best, long td);
 	long stopTime() { return start_time + __min(timeout_turn, time_left / 7) - 30; }

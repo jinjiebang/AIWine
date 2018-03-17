@@ -26,7 +26,7 @@ public:
 	int vcfNode;							//VCF节点数
 	bool vctStop;							//VCT停止标志
 	const int MAX_VCF_DEPTH = 12;			//最大vcf深度
-	const int MAX_VCT_DEPTH = 12;			//最大vct深度
+	const int MAX_VCT_DEPTH = 16;			//最大vct深度
 	const int MAX_DEFNED_FOUR = 6;			//vct算杀时，算杀方有活三时，防守方最多能冲几个四
 	const int MAX_VCT_TIME = 1000;			//VCT时间(毫秒）
 	int Range4[32];							//4格内的米字范围
@@ -45,6 +45,7 @@ public:
 	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
 	int vcfSearch(int searcher,int depth,int lastPoint);
 	int vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int *winPoint);
+	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint);
 	int vctSearch(int *winPoint);
 	Point findPoint(Piece piece, FourShape shape);
 	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀

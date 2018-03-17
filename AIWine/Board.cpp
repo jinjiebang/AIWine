@@ -292,8 +292,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 				if (board[i].shape4[who] >= E || board[i].shape4[opp] >= E)
 				{
 					cand[nCand].value = board[i].prior(who);
-					cand[nCand].point = i;
-					if (cand[nCand].value >= 5) nCand++;
+					cand[nCand++].point = i;
 				}
 			}
 		}
@@ -577,7 +576,7 @@ int Board::vctSearch(int *winPoint)
 	int depth;
 	Point lastPoint = findLastPoint();
 	if (lastPoint == -1) return 0;
-	for (depth = 8; depth <= MAX_VCT_DEPTH; depth+=2)
+	for (depth = 10; depth <= MAX_VCT_DEPTH; depth+=2)
 	{
 		result = vctSearch(who, 0, depth, lastPoint, winPoint);
 		if (result > 0||vctStop)
@@ -589,11 +588,129 @@ int Board::vctSearch(int *winPoint)
 	cout << "MESSAGE VCT花费时间：" << vctTime << "ms 节点数：" << vctNode << " 层数：" << __min(depth,MAX_VCT_DEPTH) << " 超时停止：" << vctStop << endl;
 	return result;
 }
+//VCT搜索
+int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
+{
+	int q;
+	//本方能成五
+	if (nShape[who][A] >= 1) return 1;
+	if (nShape[opp][A] >= 2) return -2;
+	//对方下一步能成五，挡在成五点
+	if (nShape[opp][A] == 1)
+	{
+		for (int m = upperLeft; m < lowerRight; m++)
+		{
+			if (board[m].isCand() && board[m].shape4[opp] == A)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+				undo();
+				if (q < 0) q--;
+				else if (q > 0) q++;
+				return q;
+			}
+		}
 
+	}
+	//本方能成活四,三步胜利
+	if (nShape[who][B] >= 1) return 3;
+	//大于最大深度不再扩展
+	if (depth > maxDepth) return 0;
+	//对方是算杀方且能活四，防守
+	if (who != searcher&&nShape[opp][B] >= 1)
+	{
+		int max_q = -1000;
+		for (int m = upperLeft; m <= lowerRight; m++)
+		{
+			if (board[m].isCand() && (board[m].shape4[opp] >= E || board[m].shape4[who] >= E))
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+				undo();
+				if (q > 0) return q + 1;//有个防守点能赢，就算赢
+				else if (q == 0) return 0;
+				else if (q > max_q) max_q = q;
+			}
+		}
+		return max_q;//q>0时，会提前返回，剩下的情况，如果等于0，返回0，否则返回最大的q值，所以直接返回max_q即可
+	}
+	//本方是算杀方，有冲四活三，尝试
+	if (who == searcher&&nShape[who][C] >= 1)
+	{
+		//对方没有能成四的点，五步胜利
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		{
+			return 5;
+		}
+		for (int m = upperLeft; m < lowerRight; m++)
+		{
+			if (board[m].isCand() && board[m].shape4[who] == C)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m);
+				undo();
+				if (q > 0) return q + 1;
+
+			}
+		}
+	}
+	//攻击方尝试双活三
+	if (who == searcher&&nShape[who][F]>0)
+	{
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		{
+			return 5;
+		}
+		for (int m = upperLeft; m < lowerRight; m++)
+		{
+			if (board[m].isCand() && board[m].shape4[who] == F)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m);
+				undo();
+				if (q > 0) return q + 1;
+			}
+		}
+	}
+	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
+	if (who == searcher&&nShape[who][D] >= 1)
+	{
+		//后续算杀只考虑米字范围，防止vct爆炸
+		for (int r : Range4)
+		{
+			int m = lastPoint + r;
+			if (board[m].isCand() && board[m].shape4[who] == D)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m);
+				undo();
+				if (q > 0) return q + 1;
+			}
+		}
+	}
+
+	//尝试活三加其他棋型
+	if (who == searcher && nShape[who][G] >= 1)
+	{
+		//后续算杀只考虑米字范围，防止vct爆炸
+		for (int r : Range3)
+		{
+			int m = lastPoint + r;
+			if (board[m].isCand() && board[m].shape4[who] == G)
+			{
+				move(m);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m);
+				undo();
+				if (q > 0) return q + 1;
+			}
+		}
+	}
+
+	return 0;
+}
 //VCT搜索
 int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winPoint)
 {
-	if (depth > maxDepth|| vctStop) return 0;
 	static int cnt;
 	if (--cnt<0)
 	{
@@ -639,6 +756,8 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		if (depth == 0) *winPoint = findPoint(who, B);
 		return 3;
 	}
+	//大于最大深度，不再扩展
+	if (depth > maxDepth || vctStop) return 0;
 	//对方是算杀方且能活四，防守
 	if (who != searcher&&nShape[opp][B] >= 1)
 	{

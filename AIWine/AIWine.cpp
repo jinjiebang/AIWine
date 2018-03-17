@@ -46,6 +46,22 @@ void AIWine::turnMove(int x, int y)
 	int point = makePoint(x + 4, y + 4);
 	board->move(point);
 }
+//删除会被VCT胜的点
+void AIWine::delVctLose()
+{
+	int lastPoint, winPoint;
+	for (int i = 0; i < nRootCand; i++)
+	{
+		Cand& c = rootCand[i];
+		board->move(c.point);
+		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 10, lastPoint, &winPoint) > 0)
+		{
+			c.value = LoseScore;
+		}
+		board->undo();
+	}
+	delLoseCand();
+}
 //获取最佳点
 void AIWine::turnBest(int &x, int &y)
 {
@@ -62,7 +78,6 @@ void AIWine::turnBest(int &x, int &y)
 	}
 	if (timeout_turn == 0) timeout_turn = 10000;
 	if (timeout_match == 0) timeout_match = time_left = 1000000;
-	int temp_best = rootBest.point;
 	nSearched = 0;
 
 	bool isSolved = false;
@@ -78,27 +93,24 @@ void AIWine::turnBest(int &x, int &y)
 		isSolved = true;
 		cout << "MESSAGE VCT算杀成功！必胜点[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
 	}
-	//如果没有算到杀
+	//算对方的VCT,删除对方能VCT胜的点
 	if (!isSolved)
 	{
 		board->generateCand(rootCand, nRootCand);
-		for (int i = 0; i < nRootCand; i++)
+		sortCand(rootCand, nRootCand);
+		Point firstPoint = rootCand[0].point;
+		delVctLose();
+		if (nRootCand == 0)
 		{
-			board->move(rootCand[i].point);
-			int lastPoint = board->findLastPoint();
-			int winPoint = 0;
-			bool vctLose = false;
-			if (lastPoint != -1&& board->vctSearch(board->who, 0, 10, lastPoint, &winPoint)>0)
-			{
-				vctLose = true;
-			}
-			board->undo();
-			if (vctLose)
-			{
-				rootCand[i].value = -10000;
-				delLoseCand(rootCand, nRootCand);
-			}
+			rootBest.point = firstPoint;
+			isSolved = true;
+			cout << "MESSAGE 对方VCT必胜!"<< endl;
 		}
+	}
+	if (!isSolved)
+	{
+		board->ply = 0, board->maxPly = 0;
+		int temp_best = rootBest.point;
 		for (int depth = MinDepth; depth <= MaxDepth; depth++)
 		{
 			t0 = getTime();
@@ -108,6 +120,7 @@ void AIWine::turnBest(int &x, int &y)
 
 			t1 = getTime(); td = t1 - t0;
 			showDepthInfo(depth, rootBest, td);
+			if (nRootCand > 1) delLoseCand();
 			if (rootBest.value == 10000 || rootBest.value == -10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 		}
 		assert(temp_best != rootBest.point);
@@ -121,31 +134,6 @@ void AIWine::turnBest(int &x, int &y)
 //根节点搜索
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
 {
-	board->ply = 0, board->maxPly = 0;
-	if(depth>MinDepth)
-	{
-		delLoseCand(rootCand, nRootCand);
-		if (nRootCand == 0)
-		{
-			nRootCand = 1;
-			rootCand[0].value = -10000;
-			return rootCand[0];
-		}
-	}
-
-	if (nRootCand == 0)
-	{
-		board->getEmptyCand(rootCand, nRootCand);
-	}
-	else if (nRootCand == 1)
-	{
-		rootCand[0].value = 0;
-		return rootCand[0];
-	}
-	else
-	{
-		sortCand(rootCand, nRootCand);
-	}
 	Cand best = Cand(0, alpha - 1);
 	int value;
 	for (int i = 0; i < nRootCand; i++)
@@ -203,7 +191,10 @@ int AIWine::search(int depth, int alpha, int beta)
 			}
 			else
 			{
-				return board->vcfSearch(board->who, 0, lastPoint) > 0 ? 10000 : eval;
+				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return 10000;
+				else if (board->vctSearch(board->who, 0, 8, lastPoint) > 0) return 10000;
+				else return eval;
+				//return board->vcfSearch(board->who, 0, lastPoint) > 0 ? 10000 : eval;
 			}
 		}
 		else {
@@ -264,17 +255,17 @@ int AIWine::search(int depth, int alpha, int beta)
 	return alpha;
 }
 //删除必败点
-void AIWine::delLoseCand(Cand cand[], int &nCand)
+void AIWine::delLoseCand()
 {
-	for (int i = nCand - 1; i >= 0; i--)
+	for (int i = nRootCand - 1; i >= 0; i--)
 	{
-		if (cand[i].value == -10000)
+		if (rootCand[i].value == -10000)
 		{
-			for (int j = i + 1; j < nCand; j++)
+			for (int j = i + 1; j < nRootCand; j++)
 			{
-				cand[j - 1] = cand[j];
+				rootCand[j - 1] = rootCand[j];
 			}
-			nCand--;
+			nRootCand--;
 		}
 	}
 }
