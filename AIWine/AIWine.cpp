@@ -119,6 +119,7 @@ void AIWine::turnBest(int &x, int &y)
 		{
 			t0 = getTime();
 
+			sortCand(rootCand, nRootCand);
 			best = rootSearch(depth, LoseScore, WinScore);
 			if (best.point != 0) rootBest = best;
 
