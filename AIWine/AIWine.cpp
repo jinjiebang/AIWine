@@ -198,7 +198,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
 			{
 				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				if (board->ply < 6 && board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;
+				if (eval>alpha && board->vctSearch(board->who, 0, 10, lastPoint) > 0) return WinScore;
 			}
 			return eval;
 		}
