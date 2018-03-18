@@ -25,7 +25,7 @@ public:
 	int vctNode;							//VCT节点数
 	int vcfNode;							//VCF节点数
 	bool vctStop;							//VCT停止标志
-	const int MAX_VCF_DEPTH = 12;			//最大vcf深度
+	const int MAX_VCF_DEPTH = 20;			//最大vcf深度
 	const int MAX_VCT_DEPTH = 16;			//最大vct深度
 	const int MAX_DEFNED_FOUR = 6;			//vct算杀时，算杀方有活三时，防守方最多能冲几个四
 	const int MAX_VCT_TIME = 1000;			//VCT时间(毫秒）

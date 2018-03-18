@@ -183,12 +183,12 @@ int AIWine::search(int depth, int alpha, int beta)
 	//到达叶节点
 	if (depth <= 0)
 	{
-		//if (board->isExpand())//冲四挡后评价
-		//{
-		//	depth++;
-		//}
-		//else
-		//{
+		if (board->isExpand())//冲四挡后评价
+		{
+			depth++;
+		}
+		else
+		{
 			int lastPoint;
 			int eval = board->evaluateTest();
 			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
@@ -197,7 +197,7 @@ int AIWine::search(int depth, int alpha, int beta)
 				/*if (board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;*/
 			}
 			return eval;
-		//}
+		}
 	}
 	if ((q = hashTable->queryRecord(depth, alpha, beta)) != HashTable::InvalidVal) return q;
 
