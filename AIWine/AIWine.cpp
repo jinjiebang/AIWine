@@ -115,13 +115,13 @@ void AIWine::turnBest(int &x, int &y)
 		{
 			t0 = getTime();
 
-			best = rootSearch(depth, -10000, 10000);
+			best = rootSearch(depth, LoseScore, WinScore);
 			if (best.point != 0) rootBest = best;
 
 			t1 = getTime(); td = t1 - t0;
 			showDepthInfo(depth, rootBest, td);
 			if (nRootCand > 1) delLoseCand();
-			if (rootBest.value == 10000 || rootBest.value == -10000 || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
+			if (rootBest.value == WinScore || rootBest.value == LoseScore || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 		}
 		assert(temp_best != rootBest.point);
 	}
@@ -130,6 +130,7 @@ void AIWine::turnBest(int &x, int &y)
 	y = pointY(rootBest.point) - 4;
 	assert(isValidPos(x, y));
 	turnMove(x, y);
+	/*cout << "MESSAGE 当前局面评价分;" << -board->evaluateDebug() << endl;*/
 }
 //根节点搜索
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
@@ -159,7 +160,7 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 		{
 			best = rootCand[i];
 			alpha = value;
-			if (value == 10000) return best;
+			if (value == WinScore) return best;
 		}
 		
 	}
@@ -178,28 +179,25 @@ int AIWine::search(int depth, int alpha, int beta)
 	nSearched++;
 	//简单胜
 	int q = board->quickWinSearch();
-	if (q != 0) return q > 0 ? 10000 : -10000;
+	if (q != 0) return q > 0 ? WinScore : LoseScore;
 	//到达叶节点
 	if (depth <= 0)
 	{
-		int eval = board->evaluate();
-		if (eval>alpha&&eval<beta) {
-			int lastPoint = board->findLastPoint();
-			if (lastPoint == -1)
+		//if (board->isExpand())//冲四挡后评价
+		//{
+		//	depth++;
+		//}
+		//else
+		//{
+			int lastPoint;
+			int eval = board->evaluateTest();
+			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
 			{
-				return eval;
+				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
+				/*if (board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;*/
 			}
-			else
-			{
-				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return 10000;
-				else if (board->vctSearch(board->who, 0, 8, lastPoint) > 0) return 10000;
-				else return eval;
-				//return board->vcfSearch(board->who, 0, lastPoint) > 0 ? 10000 : eval;
-			}
-		}
-		else {
 			return eval;
-		}
+		//}
 	}
 	if ((q = hashTable->queryRecord(depth, alpha, beta)) != HashTable::InvalidVal) return q;
 
@@ -259,7 +257,7 @@ void AIWine::delLoseCand()
 {
 	for (int i = nRootCand - 1; i >= 0; i--)
 	{
-		if (rootCand[i].value == -10000)
+		if (rootCand[i].value == LoseScore)
 		{
 			for (int j = i + 1; j < nRootCand; j++)
 			{

@@ -14,10 +14,8 @@ public:
 	~AIWine();
 	static const int MaxSize = 28;
 	static const int MaxDepth = 50;
-	static const int MinDepth = 2;
+	static const int MinDepth = 1;
 	static const int MaxCand = 256;
-	static const int WinScore = 10000;
-	static const int LoseScore = -10000;
 
 	void restart();
 	void turnUndo();

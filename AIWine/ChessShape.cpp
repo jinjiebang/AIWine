@@ -6,6 +6,22 @@ char ChessShape::shapeTable[256][256] = { 0 };
 short ChessShape::shapePrior[256][256] = { 0 };
 short ChessShape::shapeRank[256][256] = { 0 };
 char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
+/*
+4.活一与眠二：1 
+5.活二：5 
+6.活二加眠一：12
+7.活二加眠二或活一：15
+8.双活二：18
+9.眠三：10
+10.眠三加眠一：12
+11.眠三加眠二或活一：15
+12.眠三加活二：18
+13.活三:10
+14.冲四：20
+15.禁手：0
+*/
+//const int ChessShape::fourShapeScore[16] = { 0,2,8,12,24,100,110,124,200,140,150,180,260,1200,0,0 };
+const int ChessShape::fourShapeScore[16] = { 0,0,0,0,1,5,12,15,18,10,12,18,20,15,25,0 };
 //初始化棋形
 void ChessShape::initShape()
 {
@@ -105,13 +121,17 @@ int ChessShape::getFourShape(int s1, int s2, int s3, int s4)
 	if (n[BLOCK4] >= 1 && n[FLEX3] >= 1) return C;		// XOOO_ * _OO
 	if (n[BLOCK4] >= 1 && n[BLOCK3] >= 1) return D;		// XOOO_ * _OOX
 	if (n[BLOCK4] >= 1 && n[FLEX2] >= 1) return D;		// XOOO_ * _O
-	if (n[BLOCK4] >= 1 && n[BLOCK2] >= 1) return D;		// XOOO_ * _OX
-	if (n[BLOCK4] >= 1) return E;						// XOOO_
-	if (n[FLEX3] >= 2) return F;						// OO_ * _OO
-	if (n[FLEX3] >= 1 && n[BLOCK3] >= 1) return G;		// OO_ * _OOX
-	if (n[FLEX3] >= 1 && n[FLEX2] >= 1) return G;		// OO_ * _O
-	if (n[FLEX3] >= 1 && n[BLOCK2] >= 1) return G;		// OO_ * _OX
-	if (n[FLEX3] >= 1) return H;						// OO_
+	if (n[BLOCK4] >= 1 && n[BLOCK2] >= 1) return E;		// XOOO_ * _OX
+	if (n[BLOCK4] >= 1) return F;						// XOOO_
+	if (n[FLEX3] >= 2) return G;						// OO_ * _OO
+	if (n[FLEX3] >= 1 && n[BLOCK3] >= 1) return H;		// OO_ * _OOX
+	if (n[FLEX3] >= 1 && n[FLEX2] >= 1) return H;		// OO_ * _O
+	if (n[FLEX3] >= 1 && n[BLOCK2] >= 1) return I;		// OO_ * _OX
+	if (n[FLEX3] >= 1) return J;						// OO_
+	if (n[BLOCK3] + n[FLEX2] >= 2) return K;			// O_ * _OOX
+	if (n[BLOCK3] >= 1) return L;						// _OOX
+	if (n[FLEX2] >= 1) return M;						// _O
+	if (n[BLOCK2] >= 1) return N;						// _OX
 
 	return 0;
 }

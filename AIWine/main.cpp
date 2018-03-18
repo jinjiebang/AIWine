@@ -66,7 +66,7 @@ int gomocup()
 			{
 				ai->turnMove(x, y);
 				ai->turnBest(x, y);
-				cout << "MESSAGE " << "node:" << ai->nSearched << " eval:" << ai->rootBest.value << endl;
+				cout << "MESSAGE " << "node:" << ai->nSearched / 1000 << "k eval:" << ai->rootBest.value << endl;
 				cout << x << "," << y << endl;
 			}
 			else

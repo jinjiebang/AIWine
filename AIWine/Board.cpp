@@ -156,9 +156,9 @@ void Board::move(Point p)
 		}
 	}
 	//更新8个方向，两步以内的棋子数
-	for (int i = 0; i < 16; i++)
+	for (int r:RANGE)
 	{
-		board[p + RANGE[i]].neighbor++;
+		board[p + r].neighbor++;
 	}
 	
 	assert(check());
@@ -224,9 +224,9 @@ void Board::undo()
 		}
 	}
 	//更新8个方向，两步以内的棋子数
-	for (int i = 0; i < 16; i++)
+	for (int r:RANGE)
 	{
-		board[p + RANGE[i]].neighbor--;
+		board[p + r].neighbor--;
 	}
 	assert(check());
 }
@@ -280,7 +280,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 	{
 		hashMove = hashTable->best();
 		cand[0].point = hashMove;
-		cand[0].value = 10000;
+		cand[0].value = WinScore;
 		nCand = 1;
 	}
 	if (nShape[opp][B] > 0)
@@ -289,7 +289,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		{
 			if (board[i].isCand() && i != hashMove)
 			{
-				if (board[i].shape4[who] >= E || board[i].shape4[opp] >= E)
+				if (board[i].shape4[who] >= F || board[i].shape4[opp] >= F)
 				{
 					cand[nCand].value = board[i].prior(who);
 					cand[nCand++].point = i;
@@ -329,6 +329,32 @@ int Board::evaluate()
 	}
 	return eval[who] - eval[opp];
 }
+int Board::evaluateTest()
+{
+	int eval[2] = { 0 };
+	for (int shape4 = 1; shape4 <15; shape4++)
+	{
+		eval[0] += nShape[0][shape4]*ChessShape::fourShapeScore[shape4];
+		eval[1] += nShape[1][shape4]*ChessShape::fourShapeScore[shape4];
+	}
+	return eval[who] - eval[opp] + 30;
+}
+int Board::evaluateDebug()
+{
+	int eval[2] = { 0 };
+	string name[16] = { "none","none","none","none","活二加眠三","活三","活三加眠二","活三加眠三或活二","双活三","冲四","冲四加眠二","冲四加眠三或活二","冲四加活三","活四","连五" ,"禁手" };
+	for (int shape4 = 1; shape4 <15; shape4++)
+	{
+		int whoEval = nShape[who][shape4] * ChessShape::fourShapeScore[shape4];
+		int oppEval = nShape[opp][shape4] * ChessShape::fourShapeScore[shape4];
+		if (whoEval > 0) cout << "MESSAGE 本方 棋型：" << name[shape4] << " 个数" << nShape[who][shape4] << " 分值：" << whoEval << endl;
+		if (oppEval > 0) cout << "MESSAGE 对方 棋型：" << name[shape4] << " 个数" << nShape[opp][shape4] << " 分值：" << oppEval << endl;
+		eval[who] += whoEval;
+		eval[opp] += oppEval;
+	}
+	return eval[who] - eval[opp];
+}
+
 //胜利局面搜索(将在几步内赢棋)
 int Board::quickWinSearch()
 {
@@ -353,7 +379,7 @@ int Board::quickWinSearch()
 	if (nShape[who][B] >= 1) return 3;   
 	if (nShape[who][C] >= 1)             // XOOO_ * _OO
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0) return 5;
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
 			if (board[m].isCand()&&board[m].shape4[who] == C)
@@ -370,9 +396,9 @@ int Board::quickWinSearch()
 			}
 		}
 	}
-	if (nShape[who][F] >= 1)
+	if (nShape[who][G] >= 1)
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			return 5;
 		}
@@ -417,7 +443,7 @@ int Board::vcfSearch(int searcher,int depth,int lastPoint)
 	if (who==searcher&&nShape[who][C] >= 1)             
 	{
 		//对方没有能成四的点，五步胜利
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0) return 5;
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
 			if (board[m].isCand() && board[m].shape4[who] == C)
@@ -431,12 +457,12 @@ int Board::vcfSearch(int searcher,int depth,int lastPoint)
 		}
 	}
 	//本方有冲四和其他棋型(活二、眠三、眠二中的一個)
-	if (who==searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1)
+	if (who==searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] + nShape[who][E] >= 1)
 	{
 		for (int r:Range4)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && board[m].shape4[who] == D)
+			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who]==E))
 			{
 				move(m);
 				q = -vcfSearch(searcher, depth + 1, m);
@@ -446,9 +472,9 @@ int Board::vcfSearch(int searcher,int depth,int lastPoint)
 		}
 	}
 	//本方能成双活三，对方没有任何冲四或活四,五步胜利
-	if (who==searcher&&nShape[who][F] >= 1)
+	if (who==searcher&&nShape[who][G] >= 1)
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0) return 5;
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0) return 5;
 	}
 	return 0;
 }
@@ -494,7 +520,7 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
 		//对方没有能成四的点，五步胜利
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			if (depth == 0) *winPoint = findPoint(who, C);
 			return 5;
@@ -515,12 +541,12 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 		}
 	}
 	//本方有冲四和其他棋型(活二、眠三、眠二中的一個)
-	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] >= 1)
+	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] + nShape[who][E] >= 1)
 	{
 		for (int r : Range4)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && board[m].shape4[who] == D)
+			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);
 				q = -vcfSearch(searcher, depth + 1,m, winPoint);
@@ -534,11 +560,11 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 		}
 	}
 	//本方能成双活三，对方没有任何冲四或活四,五步胜利
-	if (who == searcher&&nShape[who][F] >= 1)
+	if (who == searcher&&nShape[who][G] >= 1)
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
-			if (depth == 0) *winPoint = findPoint(who, F);
+			if (depth == 0) *winPoint = findPoint(who, G);
 			return 5;
 		}
 	}
@@ -622,7 +648,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		int max_q = -1000;
 		for (int m = upperLeft; m <= lowerRight; m++)
 		{
-			if (board[m].isCand() && (board[m].shape4[opp] >= E || board[m].shape4[who] >= E))
+			if (board[m].isCand() && (board[m].shape4[opp] >= F || board[m].shape4[who] >= F))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
@@ -638,7 +664,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
 		//对方没有能成四的点，五步胜利
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			return 5;
 		}
@@ -655,15 +681,15 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		}
 	}
 	//攻击方尝试双活三
-	if (who == searcher&&nShape[who][F]>0)
+	if (who == searcher&&nShape[who][G]>0)
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			return 5;
 		}
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
-			if (board[m].isCand() && board[m].shape4[who] == F)
+			if (board[m].isCand() && board[m].shape4[who] == G)
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m);
@@ -673,13 +699,13 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		}
 	}
 	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
-	if (who == searcher&&nShape[who][D] >= 1)
+	if (who == searcher&&nShape[who][D] + nShape[who][E] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range4)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && board[m].shape4[who] == D)
+			if (board[m].isCand() && (board[m].shape4[who] == D|| board[m].shape4[who] == E))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m);
@@ -690,13 +716,13 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	}
 
 	//尝试活三加其他棋型
-	if (who == searcher && nShape[who][G] >= 1)
+	if (who == searcher && nShape[who][H] + nShape[who][I] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range3)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && board[m].shape4[who] == G)
+			if (board[m].isCand() && (board[m].shape4[who] == H|| board[m].shape4[who] == I))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m);
@@ -764,7 +790,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		int max_q = -1000;
 		for (int m = upperLeft; m <= lowerRight; m++)
 		{
-			if (board[m].isCand() && (board[m].shape4[opp] >= E||board[m].shape4[who]>=E))
+			if (board[m].isCand() && (board[m].shape4[opp] >= F||board[m].shape4[who]>=F))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
@@ -784,7 +810,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 	if (who==searcher&&nShape[who][C] >= 1)
 	{
 		//对方没有能成四的点，五步胜利
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			if (depth == 0) *winPoint = findPoint(who, C);
 			return 5;
@@ -806,16 +832,16 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		}
 	}	
 	//攻击方尝试双活三
-	if (who == searcher&&nShape[who][F]>0)
+	if (who == searcher&&nShape[who][G]>0)
 	{
-		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0)
+		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
-			if (depth == 0) *winPoint = findPoint(who, F);
+			if (depth == 0) *winPoint = findPoint(who, G);
 			return 5;
 		}
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
-			if (board[m].isCand() && board[m].shape4[who] == F)
+			if (board[m].isCand() && board[m].shape4[who] == G)
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
@@ -829,13 +855,13 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		}
 	}
 	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
-	if(who==searcher&&nShape[who][D] >= 1)
+	if(who==searcher&&nShape[who][D] + nShape[who][E] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r:Range4)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && board[m].shape4[who] == D)
+			if (board[m].isCand() && (board[m].shape4[who] == D|| board[m].shape4[who] == E))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
@@ -851,13 +877,13 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 	}
 	
 	//尝试活三加其他棋型
-	if (who== searcher && nShape[who][G] >= 1)
+	if (who== searcher && nShape[who][H] + nShape[who][I] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r:Range3)
 		{
 			int m = lastPoint +r;
-			if (board[m].isCand() && board[m].shape4[who] == G)
+			if (board[m].isCand() && (board[m].shape4[who] == H|| board[m].shape4[who] == I))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);

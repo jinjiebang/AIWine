@@ -15,7 +15,7 @@ public:
 	Point remLRCand[1024];					//记录右下角
 	int chessCount;							//棋子数
 	Piece who, opp;							//当前下子方，以及另一方
-	int nShape[2][10];						//双方下一步能成的棋形统计
+	int nShape[2][16];						//双方下一步能成的棋形统计
 	int boardSize;							//棋盘尺寸
 	Point upperLeft;						//左上角
 	Point lowerRight;						//右下角
@@ -40,6 +40,8 @@ public:
 	void generateCand(Cand cand[], int &nCand);
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
+	int evaluateTest();
+	int evaluateDebug();
 	int quickWinSearch();
 	int vcfSearch(int *winPoint);
 	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
