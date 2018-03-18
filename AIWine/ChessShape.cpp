@@ -20,7 +20,7 @@ char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
 14.冲四：20
 15.禁手：0
 */
-//const int ChessShape::fourShapeScore[16] = { 0,2,8,12,24,100,110,124,200,140,150,180,260,1200,0,0 };
+//const int ChessShape::fourShapeScore[16] = { 0,2,8,12,24,100,110,124,200,140,150,180,260,0,0,0 };
 const int ChessShape::fourShapeScore[16] = { 0,0,0,0,1,5,12,15,18,10,12,18,20,15,25,0 };
 //初始化棋形
 void ChessShape::initShape()

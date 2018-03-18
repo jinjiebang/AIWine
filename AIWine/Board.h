@@ -41,6 +41,9 @@ public:
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
 	int evaluateTest();
+	int evaluateTest2();
+	int evaluateTest3();
+	int evaluateDebug3();
 	int evaluateDebug();
 	int quickWinSearch();
 	int vcfSearch(int *winPoint);

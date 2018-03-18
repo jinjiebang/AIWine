@@ -106,6 +106,10 @@ void AIWine::turnBest(int &x, int &y)
 			isSolved = true;
 			cout << "MESSAGE 对方VCT必胜!"<< endl;
 		}
+		else if (nRootCand == 1)
+		{
+			cout << "MESSAGE 通过VCT搜索到唯一落子!" << endl;
+		}
 	}
 	if (!isSolved)
 	{
@@ -130,7 +134,7 @@ void AIWine::turnBest(int &x, int &y)
 	y = pointY(rootBest.point) - 4;
 	assert(isValidPos(x, y));
 	turnMove(x, y);
-	/*cout << "MESSAGE 当前局面评价分;" << -board->evaluateDebug() << endl;*/
+	/*cout << "MESSAGE 当前局面评价分;" << -board->evaluateDebug3() << endl;*/
 }
 //根节点搜索
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
@@ -194,7 +198,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
 			{
 				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				/*if (board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;*/
+				if (board->ply < 6 && board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;
 			}
 			return eval;
 		}
