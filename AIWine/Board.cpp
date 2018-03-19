@@ -130,14 +130,14 @@ void Board::move(Point p)
 			board[move_p].pattern[k][who] |= m;
 			if (board[move_p].piece == EMPTY)
 			{
+				UCHAR &s0 = board[move_p].shape4[0];
+				UCHAR &s1 = board[move_p].shape4[1];
 				board[move_p].update1(k);
-				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
-				
+				nShape[0][s0]--; nShape[1][s1]--;
 				board[move_p].update4();
-				int a = board[move_p].shape4[0];
-				int b = board[move_p].shape4[1];
-				//printf("点(%d,%d)的棋型是黑：%d 白：%d\n",x,y,a,b);
-				nShape[0][a]++; nShape[1][b]++;
+				nShape[0][s0]++; nShape[1][s1]++;
+				if (s0 == A) fivePoint[0] = move_p;
+				if (s1 == A) fivePoint[1] = move_p;
 			}
 		}
 		move_p = p;
@@ -148,10 +148,14 @@ void Board::move(Point p)
 			board[move_p].pattern[k][who] |= m;
 			if (board[move_p].piece == EMPTY)
 			{
+				UCHAR &s0 = board[move_p].shape4[0];
+				UCHAR &s1 = board[move_p].shape4[1];
 				board[move_p].update1(k);
-				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
+				nShape[0][s0]--; nShape[1][s1]--;
 				board[move_p].update4();
-				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
+				nShape[0][s0]++; nShape[1][s1]++;
+				if (s0 == A) fivePoint[0] = move_p;
+				if (s1 == A) fivePoint[1] = move_p;
 			}
 		}
 	}
@@ -184,6 +188,8 @@ void Board::undo()
 
 	nShape[0][chess->shape4[0]]++;
 	nShape[1][chess->shape4[1]]++;
+	if (chess->shape4[0] == A) fivePoint[0] = p;
+	if (chess->shape4[1] == A) fivePoint[1] = p;
 	chess->piece = EMPTY;
 
 	who = oppent(who);
@@ -202,10 +208,14 @@ void Board::undo()
 			board[move_p].pattern[k][who] ^= m;
 			if (board[move_p].piece == EMPTY)
 			{
+				UCHAR &s0 = board[move_p].shape4[0];
+				UCHAR &s1 = board[move_p].shape4[1];
 				board[move_p].update1(k);
-				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
+				nShape[0][s0]--; nShape[1][s1]--;
 				board[move_p].update4();
-				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
+				nShape[0][s0]++; nShape[1][s1]++;
+				if (s0 == A) fivePoint[0] = move_p;
+				if (s1 == A) fivePoint[1] = move_p;
 			}
 		}
 		move_p = p;
@@ -216,10 +226,14 @@ void Board::undo()
 			board[move_p].pattern[k][who] ^= m;
 			if (board[move_p].piece == EMPTY)
 			{
+				UCHAR &s0 = board[move_p].shape4[0];
+				UCHAR &s1 = board[move_p].shape4[1];
 				board[move_p].update1(k);
-				nShape[0][board[move_p].shape4[0]]--; nShape[1][board[move_p].shape4[1]]--;
+				nShape[0][s0]--; nShape[1][s1]--;
 				board[move_p].update4();
-				nShape[0][board[move_p].shape4[0]]++; nShape[1][board[move_p].shape4[1]]++;
+				nShape[0][s0]++; nShape[1][s1]++;
+				if (s0 == A) fivePoint[0] = move_p;
+				if (s1 == A) fivePoint[1] = move_p;
 			}
 		}
 	}
@@ -250,15 +264,9 @@ void Board::generateCand(Cand cand[], int& nCand)
 	
 	if (nShape[opp][A] > 0)
 	{
-		for (int i = upperLeft; i <= lowerRight; i++)
-		{
-			if (board[i].isCand() && board[i].shape4[opp] == A)
-			{
-				nCand = 1;
-				cand[0].point = i;
-				return;
-			}
-		}
+		nCand = 1;
+		cand[0].point = fivePoint[opp];
+		return;
 		assert(false);
 	}
 	if (nShape[who][B] > 0)
@@ -601,17 +609,11 @@ int Board::quickWinSearch()
 	if (nShape[opp][A] >= 2) return -2;  
 	if (nShape[opp][A] == 1)             
 	{
-		for (int m = upperLeft; m < lowerRight; m++)
-		{
-			if (board[m].isCand()&& board[m].shape4[opp] == A)
-			{
-				move(m);
-				q = -quickWinSearch();
-				undo();
-				if (q < 0) q--; else if (q > 0) q++;
-				return q;
-			}
-		}
+		move(fivePoint[opp]);
+		q = -quickWinSearch();
+		undo();
+		if (q < 0) q--; else if (q > 0) q++;
+		return q;
 			
 	}
 	if (nShape[who][B] >= 1) return 3;   
@@ -663,17 +665,11 @@ int Board::vcfSearch(int searcher,int depth,int lastPoint)
 	//对方下一步能成五，挡在成五点
 	if (nShape[opp][A] == 1)
 	{
-		for (int m = upperLeft; m < lowerRight; m++)
-		{
-			if (board[m].isCand() && board[m].shape4[opp] == A)
-			{
-				move(m);
-				q = -vcfSearch(searcher, depth + 1,lastPoint);
-				undo();
-				if (q < 0) q--; else if (q > 0) q++;
-				return q;
-			}
-		}
+		move(fivePoint[opp]);
+		q = -vcfSearch(searcher, depth + 1, lastPoint);
+		undo();
+		if (q < 0) q--; else if (q > 0) q++;
+		return q;
 	}
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1) return 3;
@@ -731,22 +727,16 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	//对方下一步能成五，挡在成五点
 	if (nShape[opp][A] == 1)
 	{
-		for (int m = upperLeft; m < lowerRight; m++)
+		move(fivePoint[opp]);
+		q = -vcfSearch(searcher, depth + 1, lastPoint, winPoint);
+		undo();
+		if (q < 0) q--;
+		else if (q > 0)
 		{
-			if (board[m].isCand() && board[m].shape4[opp] == A)
-			{
-				move(m);
-				q = -vcfSearch(searcher, depth + 1,lastPoint,winPoint);
-				undo();
-				if (q < 0) q--; 
-				else if (q > 0)
-				{
-					if (depth == 0) *winPoint = m;
-					q++;
-				}
-				return q;
-			}
+			if (depth == 0) *winPoint = fivePoint[opp];
+			q++;
 		}
+		return q;
 	}
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1)

@@ -31,6 +31,7 @@ public:
 	const int MAX_VCT_TIME = 1000;			//VCT时间(毫秒）
 	int Range4[32];							//4格内的米字范围
 	int Range3[32];							//3格内的米字范围和八卦点
+	int fivePoint[2];						//记录成五点
 	
 	Board(HashTable* _hashTable);
 	void initBoard(int size);
