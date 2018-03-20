@@ -195,7 +195,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
 			if (board->vctSearch(board->who, 0, 6, lastPoint) > 0) return WinScore;
 		}
-		if (board->isExpand())
+		if (eval < beta && board->isExpand())
 		{
 			depth++;
 		}
