@@ -188,26 +188,25 @@ int AIWine::search(int depth, int alpha, int beta)
 	//到达叶节点
 	if (depth <= 0)
 	{
-		if (board->isExpand())//冲四挡后评价
+		int lastPoint;
+		int eval = board->evaluateTest();
+		if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
+		{
+			if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
+			if (board->vctSearch(board->who, 0, 6, lastPoint) > 0) return WinScore;
+		}
+		if (board->isExpand())
 		{
 			depth++;
 		}
 		else
 		{
-			int lastPoint;
-			int eval = board->evaluateTest();
-			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
-			{
-				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				if (board->ply < 6 && board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;
-			}
 			return eval;
 		}
 	}
 	if ((q = hashTable->queryRecord(depth, alpha, beta)) != HashTable::InvalidVal) return q;
 
 	int hash_flag = HASH_ALPHA;
-	Point best = 0;
 	Cand cand[MaxCand];
 	int nCand = 0;
 	board->generateCand(cand, nCand);
@@ -221,6 +220,7 @@ int AIWine::search(int depth, int alpha, int beta)
 		sortCand(cand, nCand);
 	}
 	int value;
+	Point best = cand[0].point;
 	for (int i = 0; i < nCand; i++)
 	{
 		board->move(cand[i].point);

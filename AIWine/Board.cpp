@@ -267,7 +267,6 @@ void Board::generateCand(Cand cand[], int& nCand)
 		nCand = 1;
 		cand[0].point = fivePoint[opp];
 		return;
-		assert(false);
 	}
 	if (nShape[who][B] > 0)
 	{
@@ -284,7 +283,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 	}
 	//查询哈希表中的最佳点
 	Point hashMove = 0;
-	if (hashTable->present() && hashTable->best() != 0)
+	if (hashTable->present() && hashTable->depth() >= 0 && hashTable->best() != 0)
 	{
 		hashMove = hashTable->best();
 		cand[0].point = hashMove;
@@ -314,7 +313,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		{
 			cand[nCand].value = board[i].prior(who);
 			cand[nCand].point = i;
-			if (cand[nCand].value >= 5) nCand++;
+			if (cand[nCand].value > 1) nCand++;
 		}
 		assert(nCand <= 256);
 	}
@@ -583,7 +582,7 @@ int Board::evaluateTest()
 		eval[0] += nShape[0][shape4]*ChessShape::fourShapeScore[shape4];
 		eval[1] += nShape[1][shape4]*ChessShape::fourShapeScore[shape4];
 	}
-	return eval[who] - eval[opp] + 30;
+	return eval[who] - eval[opp] + 50;
 }
 int Board::evaluateDebug()
 {

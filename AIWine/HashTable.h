@@ -26,7 +26,7 @@ public:
 	int queryRecord(int depth,int alpha,int beta)
 	{
 		//如果是pv节点,不做置换表截断
-		/*if (beta > alpha + 1) return InvalidVal;*/
+		if (beta > alpha + 1) return InvalidVal;
 		if (currentItem->key == hashKey)
 		{
 			if (currentItem->depth >= depth)
