@@ -37,7 +37,9 @@ public:
 	long start_time;						//开始时间
 	bool terminateAI;						//停止搜索标志
 
-	void delLoseCand(Cand cand[],int &nCand);
+	void delLoseCand();
+	void delVctLose();
+	void checkOppVct();
 	void sortCand(Cand cand[], int nCand);
 	void showDepthInfo(int depth, Cand best, long td);
 	long stopTime() { return start_time + __min(timeout_turn, time_left / 7) - 30; }

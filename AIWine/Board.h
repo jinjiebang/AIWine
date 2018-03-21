@@ -15,13 +15,23 @@ public:
 	Point remLRCand[1024];					//记录右下角
 	int chessCount;							//棋子数
 	Piece who, opp;							//当前下子方，以及另一方
-	int nShape[2][10];						//双方下一步能成的棋形统计
+	int nShape[2][16];						//双方下一步能成的棋形统计
 	int boardSize;							//棋盘尺寸
 	Point upperLeft;						//左上角
 	Point lowerRight;						//右下角
 	int ply;								//当前搜索层数
-	int maxPly;								//最大搜索层数
-	int limitPly;							//vcf限制层数
+	int maxPly;								//实际搜索的最大层数
+	long t_VCT_Start;						//VCT开始搜索时间
+	int vctNode;							//VCT节点数
+	int vcfNode;							//VCF节点数
+	bool vctStop;							//VCT停止标志
+	const int MAX_VCF_DEPTH = 20;			//最大vcf深度
+	const int MAX_VCT_DEPTH = 16;			//最大vct深度
+	const int MAX_DEFNED_FOUR = 6;			//vct算杀时，算杀方有活三时，防守方最多能冲几个四
+	const int MAX_VCT_TIME = 1000;			//VCT时间(毫秒）
+	int Range4[32];							//4格内的米字范围
+	int Range3[32];							//3格内的米字范围和八卦点
+	int fivePoint[2];						//记录成五点
 	
 	Board(HashTable* _hashTable);
 	void initBoard(int size);
@@ -31,11 +41,23 @@ public:
 	void generateCand(Cand cand[], int &nCand);
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
+	int evaluateTest();
+	int evaluateTest2();
+	int evaluateTest3();
+	int evaluateDebug3();
+	int evaluateDebug();
 	int quickWinSearch();
-	int vcfSearch();
+	int vcfSearch(int *winPoint);
+	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
+	int vcfSearch(int searcher,int depth,int lastPoint);
+	int vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int *winPoint);
+	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint);
+	int vctSearch(int *winPoint);
+	Point findPoint(Piece piece, FourShape shape);
+	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀
 
 	//内联方法
-	bool isExpand() { return nShape[opp][A] > 0 || nShape[opp][B] > 0 || nShape[opp][C] > 0; }
+	bool isExpand() { return nShape[opp][A] > 0; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
@@ -44,6 +66,7 @@ public:
 	int min(int a, int b) { return a < b ? a : b; }
 	bool inBoard(int index) { return board[index].piece != OUTSIDE; }
 	Piece oppent(Piece piece) { return piece == BLACK ? WHITE : BLACK; }
+	long getTime() { return clock() * 1000 / CLOCKS_PER_SEC; }
 private:
 	HashTable* hashTable;
 };

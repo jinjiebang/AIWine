@@ -12,6 +12,7 @@ public:
 	static short shapePrior[256][256];	//棋型等级表
 	static short shapeRank[256][256];	//棋型估值表
 	static char fourShapeTable[10][10][10][10];//组合棋形表
+	static const int fourShapeScore[16];	//组合棋型分值表
 	
 private:
 	static int getFourShape(int s1, int s2, int s3, int s4);

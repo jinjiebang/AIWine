@@ -25,6 +25,8 @@ public:
 	//查询置换表
 	int queryRecord(int depth,int alpha,int beta)
 	{
+		//如果是pv节点,不做置换表截断
+		if (beta > alpha + 1) return InvalidVal;
 		if (currentItem->key == hashKey)
 		{
 			if (currentItem->depth >= depth)
@@ -66,7 +68,7 @@ public:
 	short   depth() { return currentItem->depth; }
 	Point best() { return currentItem->best; }
 	U64 Rand64(){ return rand() ^ ((U64)rand() << 15) ^ ((U64)rand() << 30) ^ ((U64)rand() << 45) ^ ((U64)rand() << 60);}
-	static const int HashSize = 1 << 20;
+	static const int HashSize = 1 << 23;
 	static const int InvalidVal = -20000;
 private:
 	struct HashItem
