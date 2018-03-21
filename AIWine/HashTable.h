@@ -68,7 +68,7 @@ public:
 	short   depth() { return currentItem->depth; }
 	Point best() { return currentItem->best; }
 	U64 Rand64(){ return rand() ^ ((U64)rand() << 15) ^ ((U64)rand() << 30) ^ ((U64)rand() << 45) ^ ((U64)rand() << 60);}
-	static const int HashSize = 1 << 20;
+	static const int HashSize = 1 << 23;
 	static const int InvalidVal = -20000;
 private:
 	struct HashItem

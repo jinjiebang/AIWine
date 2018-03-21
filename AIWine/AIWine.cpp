@@ -54,12 +54,32 @@ void AIWine::delVctLose()
 	{
 		Cand& c = rootCand[i];
 		board->move(c.point);
-		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 10, lastPoint, &winPoint) > 0)
+		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 10, lastPoint) > 0)
 		{
 			c.value = LoseScore;
 		}
 		board->undo();
 	}
+	delLoseCand();
+}
+//检查对方VCT,从分数最高的点开始算VCT,直接找到一个不败的点
+void AIWine::checkOppVct()
+{
+	int lastPoint;
+	bool findVct;
+	int index = 0;
+	do
+	{
+		findVct = false;
+		Cand& c = rootCand[index++];
+		board->move(c.point);
+		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 14, lastPoint) > 0)
+		{
+			c.value = LoseScore;
+			findVct = true;
+		}
+		board->undo();
+	} while (findVct && index < nRootCand);
 	delLoseCand();
 }
 //获取最佳点
@@ -114,21 +134,37 @@ void AIWine::turnBest(int &x, int &y)
 	if (!isSolved)
 	{
 		board->ply = 0, board->maxPly = 0;
-		int temp_best = rootBest.point;
+		/*board->generateCand(rootCand, nRootCand);
+		sortCand(rootCand, nRootCand);*/
+		int lastBest = rootBest.point;
 		for (int depth = MinDepth; depth <= MaxDepth; depth++)
 		{
 			t0 = getTime();
 
-			sortCand(rootCand, nRootCand);
+			
 			best = rootSearch(depth, LoseScore, WinScore);
 			if (best.point != 0) rootBest = best;
 
 			t1 = getTime(); td = t1 - t0;
-			showDepthInfo(depth, rootBest, td);
 			if (nRootCand > 1) delLoseCand();
+			showDepthInfo(depth, rootBest, td);
 			if (rootBest.value == WinScore || rootBest.value == LoseScore || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
+			
+			sortCand(rootCand, nRootCand);
+			checkOppVct();
+			if (nRootCand == 0)
+			{
+				cout << "MESSAGE 对方VCT必胜!" << endl;
+				break;
+			}
+			else if (nRootCand == 1)
+			{
+				cout << "MESSAGE 通过VCT搜索到唯一落子!" << endl;
+				rootBest = rootCand[0];
+				break;
+			}
 		}
-		assert(temp_best != rootBest.point);
+		assert(lastBest != rootBest.point);
 	}
 	
 	x = pointX(rootBest.point) - 4;
@@ -188,19 +224,19 @@ int AIWine::search(int depth, int alpha, int beta)
 	//到达叶节点
 	if (depth <= 0)
 	{
-		int lastPoint;
-		int eval = board->evaluateTest();
-		if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
-		{
-			if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-			if (board->vctSearch(board->who, 0, 6, lastPoint) > 0) return WinScore;
-		}
-		if (eval < beta && board->isExpand())
+		if (board->isExpand())
 		{
 			depth++;
 		}
 		else
 		{
+			int lastPoint;
+			int eval = board->evaluate();
+			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
+			{
+				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
+				/*if (board->ply < 6 && eval > alpha && board->vctSearch(board->who, 0, 4, lastPoint) > 0) return WinScore;*/
+			}
 			return eval;
 		}
 	}

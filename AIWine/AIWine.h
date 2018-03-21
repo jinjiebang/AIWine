@@ -39,6 +39,7 @@ public:
 
 	void delLoseCand();
 	void delVctLose();
+	void checkOppVct();
 	void sortCand(Cand cand[], int nCand);
 	void showDepthInfo(int depth, Cand best, long td);
 	long stopTime() { return start_time + __min(timeout_turn, time_left / 7) - 30; }
