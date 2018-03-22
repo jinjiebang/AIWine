@@ -68,10 +68,12 @@ void AIWine::checkOppVct()
 	int lastPoint;
 	bool findVct;
 	int index = 0;
+	board->t_VCT_Start = getTime();
 	do
 	{
 		findVct = false;
 		Cand& c = rootCand[index++];
+		isCheckVCT[c.point] = true;
 		board->move(c.point);
 		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 14, lastPoint) > 0)
 		{
@@ -81,6 +83,8 @@ void AIWine::checkOppVct()
 		board->undo();
 	} while (findVct && index < nRootCand);
 	delLoseCand();
+	long time = getTime() - board->t_VCT_Start;
+	cout << "MESSAGE 每层搜索后的VCT花费时间" << time << "ms" << endl;
 }
 //获取最佳点
 void AIWine::turnBest(int &x, int &y)
@@ -97,7 +101,7 @@ void AIWine::turnBest(int &x, int &y)
 		return;
 	}
 	if (timeout_turn == 0) timeout_turn = 10000;
-	if (timeout_match == 0) timeout_match = time_left = 1000000;
+	if (timeout_match == 0) timeout_match = time_left = 10000000;
 	nSearched = 0;
 
 	bool isSolved = false;
@@ -137,6 +141,7 @@ void AIWine::turnBest(int &x, int &y)
 		/*board->generateCand(rootCand, nRootCand);
 		sortCand(rootCand, nRootCand);*/
 		int lastBest = rootBest.point;
+		memset(isCheckVCT, 0, sizeof(isCheckVCT));
 		for (int depth = MinDepth; depth <= MaxDepth; depth++)
 		{
 			t0 = getTime();
@@ -151,6 +156,7 @@ void AIWine::turnBest(int &x, int &y)
 			if (rootBest.value == WinScore || rootBest.value == LoseScore || nRootCand == 1 || terminateAI || t1 + 5 * td - stopTime() >= 0) break;
 			
 			sortCand(rootCand, nRootCand);
+			if (depth > MinDepth && isCheckVCT[rootBest.point]) continue;
 			checkOppVct();
 			if (nRootCand == 0)
 			{
@@ -163,8 +169,8 @@ void AIWine::turnBest(int &x, int &y)
 				rootBest = rootCand[0];
 				break;
 			}
+			lastBest = rootBest.point;
 		}
-		assert(lastBest != rootBest.point);
 	}
 	
 	x = pointX(rootBest.point) - 4;

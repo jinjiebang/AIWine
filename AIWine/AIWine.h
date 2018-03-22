@@ -36,6 +36,7 @@ public:
 	int time_left;							//剩余时间
 	long start_time;						//开始时间
 	bool terminateAI;						//停止搜索标志
+	bool isCheckVCT[1024];					//记录是否算过VCT
 
 	void delLoseCand();
 	void delVctLose();

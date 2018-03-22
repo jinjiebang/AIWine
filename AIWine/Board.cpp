@@ -844,6 +844,15 @@ int Board::vctSearch(int *winPoint)
 //VCT搜索
 int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 {
+	static int cnt;
+	if (--cnt<0)
+	{
+		cnt = 1000;
+		if (getTime() - t_VCT_Start > MAX_VCT_TIME)
+		{
+			vctStop = true;
+		}
+	}
 	int q;
 	//本方能成五
 	if (nShape[who][A] >= 1) return 1;
@@ -868,7 +877,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1) return 3;
 	//大于最大深度不再扩展
-	if (depth > maxDepth) return 0;
+	if (depth > maxDepth || vctStop) return 0;
 	//对方是算杀方且能活四，防守
 	if (who != searcher&&nShape[opp][B] >= 1)
 	{
