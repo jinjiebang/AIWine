@@ -5,6 +5,8 @@
 #include "HashTable.h"
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 class Board
 {
 public:
@@ -50,13 +52,16 @@ public:
 	int vcfSearch(int *winPoint);
 	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
 	int vcfSearch(int searcher,int depth,int lastPoint);
-	int vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int *winPoint);
 	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint);
+	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* winPoint);
+	int vctSearch(int maxDepth, int *winPoint);
 	int vctSearch(int *winPoint);
+	
 	Point findPoint(Piece piece, FourShape shape);
 	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀
 
 	//内联方法
+	void vctStart() { t_VCT_Start = getTime(); vctStop = false; vctNode = 0; }
 	bool isExpand() { return nShape[opp][A] > 0; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }

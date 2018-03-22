@@ -822,15 +822,13 @@ Point Board::findLastPoint()
 }
 int Board::vctSearch(int *winPoint)
 {
-	t_VCT_Start = getTime();
-	vctNode = 0;
-	vctStop = false;
-	int result = 0;
-	int depth;
-	Point lastPoint = findLastPoint();
-	if (lastPoint == -1) return 0;
+	vctStart();
+	int lastPoint;
+	if ((lastPoint=findLastPoint()) == -1) return 0;
+	int depth, result;
 	for (depth = 10; depth <= MAX_VCT_DEPTH; depth+=2)
 	{
+		/*result = vctSearch(depth, winPoint);*/
 		result = vctSearch(who, 0, depth, lastPoint, winPoint);
 		if (result > 0||vctStop)
 		{
@@ -853,6 +851,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 			vctStop = true;
 		}
 	}
+	vctNode++;
 	int q;
 	//本方能成五
 	if (nShape[who][A] >= 1) return 1;
@@ -971,7 +970,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	return 0;
 }
 //VCT搜索
-int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winPoint)
+int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* winPoint)
 {
 	static int cnt;
 	if (--cnt<0)
@@ -1001,7 +1000,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
 				undo();
-				if (q < 0) q--; 
+				if (q < 0) q--;
 				else if (q > 0)
 				{
 					if (depth == 0) *winPoint = m;
@@ -1026,7 +1025,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		int max_q = -1000;
 		for (int m = upperLeft; m <= lowerRight; m++)
 		{
-			if (board[m].isCand() && (board[m].shape4[opp] >= F||board[m].shape4[who]>=F))
+			if (board[m].isCand() && (board[m].shape4[opp] >= F || board[m].shape4[who] >= F))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
@@ -1043,7 +1042,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		return max_q;//q>0时，会提前返回，剩下的情况，如果等于0，返回0，否则返回最大的q值，所以直接返回max_q即可
 	}
 	//本方是算杀方，有冲四活三，尝试
-	if (who==searcher&&nShape[who][C] >= 1)
+	if (who == searcher&&nShape[who][C] >= 1)
 	{
 		//对方没有能成四的点，五步胜利
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
@@ -1056,7 +1055,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, m,winPoint);
+				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
 				undo();
 				if (q > 0)
 				{
@@ -1066,7 +1065,7 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 
 			}
 		}
-	}	
+	}
 	//攻击方尝试双活三
 	if (who == searcher&&nShape[who][G]>0)
 	{
@@ -1091,13 +1090,13 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 		}
 	}
 	//本方是算杀方,尝试剩下的所有冲四点（除掉冲四活三)
-	if(who==searcher&&nShape[who][D] + nShape[who][E] >= 1)
+	if (who == searcher&&nShape[who][D] + nShape[who][E] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
-		for (int r:Range4)
+		for (int r : Range4)
 		{
 			int m = lastPoint + r;
-			if (board[m].isCand() && (board[m].shape4[who] == D|| board[m].shape4[who] == E))
+			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
@@ -1107,19 +1106,19 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 					if (depth == 0) *winPoint = m;
 					return q + 1;
 				}
-					
+
 			}
 		}
 	}
-	
+
 	//尝试活三加其他棋型
-	if (who== searcher && nShape[who][H] + nShape[who][I] >= 1)
+	if (who == searcher && nShape[who][H] + nShape[who][I] >= 1)
 	{
 		//后续算杀只考虑米字范围，防止vct爆炸
-		for (int r:Range3)
+		for (int r : Range3)
 		{
-			int m = lastPoint +r;
-			if (board[m].isCand() && (board[m].shape4[who] == H|| board[m].shape4[who] == I))
+			int m = lastPoint + r;
+			if (board[m].isCand() && (board[m].shape4[who] == H || board[m].shape4[who] == I))
 			{
 				move(m);
 				q = -vctSearch(searcher, depth + 1, maxDepth, m, winPoint);
@@ -1135,6 +1134,8 @@ int Board::vctSearch(int searcher,int depth,int maxDepth,int lastPoint,int* winP
 
 	return 0;
 }
+
+
 //获取所有空的点
 void Board::getEmptyCand(Cand cand[], int &nCand)
 {
@@ -1165,4 +1166,38 @@ bool Board::check()
 				return false;
 			}
 	return true;
+}
+bool  compareCand(const Cand &a, const Cand &b)
+{
+	return a.value > b.value;
+}
+int Board::vctSearch(int maxDepth,int *winPoint)
+{
+	vector<Cand> moveList;
+	for (int m = upperLeft; m < lowerRight; m++)
+	{
+		if (board[m].isCand()&&board[m].shape4[who]>=I)
+		{
+			Cand cand(m, board[m].prior(who));
+			moveList.push_back(cand);
+		}
+	}
+	//排序后对12个最好的分支算杀
+	if (moveList.size() > 0)
+	{
+		int searcher = who;
+		sort(moveList.begin(), moveList.end(), compareCand);
+		for (int i = 0; i < 20 && i < moveList.size(); i++)
+		{
+			Point point = moveList[i].point;
+			move(point);
+			int q = -vctSearch(searcher, 1, maxDepth, point);
+			undo();
+			if (q > 0) {
+				if(winPoint!=nullptr) *winPoint = point;
+				return q + 1;
+			}
+		}
+	}
+	return 0;
 }

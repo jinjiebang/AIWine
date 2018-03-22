@@ -50,10 +50,12 @@ void AIWine::turnMove(int x, int y)
 void AIWine::delVctLose()
 {
 	int lastPoint, winPoint;
+	board->vctStart();
 	for (int i = 0; i < nRootCand; i++)
 	{
 		Cand& c = rootCand[i];
 		board->move(c.point);
+		/*if(board->vctSearch(10,nullptr)>0)*/
 		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 10, lastPoint) > 0)
 		{
 			c.value = LoseScore;
@@ -68,7 +70,7 @@ void AIWine::checkOppVct()
 	int lastPoint;
 	bool findVct;
 	int index = 0;
-	board->t_VCT_Start = getTime();
+	board->vctStart();
 	do
 	{
 		findVct = false;
@@ -76,6 +78,7 @@ void AIWine::checkOppVct()
 		isCheckVCT[c.point] = true;
 		board->move(c.point);
 		if ((lastPoint = board->findLastPoint()) != -1 && board->vctSearch(board->who, 0, 14, lastPoint) > 0)
+		/*if(board->vctSearch(14,nullptr)>0)*/
 		{
 			c.value = LoseScore;
 			findVct = true;
@@ -241,7 +244,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
 			{
 				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				/*if (board->ply < 6 && eval > alpha && board->vctSearch(board->who, 0, 4, lastPoint) > 0) return WinScore;*/
+				if (board->ply < 6 && eval > alpha && board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;
 			}
 			return eval;
 		}
