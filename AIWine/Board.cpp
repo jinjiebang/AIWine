@@ -334,7 +334,7 @@ int Board::evaluate()
 			eval[p] += ChessShape::shapeRank[c->pattern[k][p]][c->pattern[k][1 - p]];
 		}
 	}
-	return eval[who] - eval[opp] + 50;
+	return eval[who] - eval[opp] + 70;
 }
 int Board::evaluateTest2()
 {
