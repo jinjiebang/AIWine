@@ -859,19 +859,12 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	//对方下一步能成五，挡在成五点
 	if (nShape[opp][A] == 1)
 	{
-		for (int m = upperLeft; m < lowerRight; m++)
-		{
-			if (board[m].isCand() && board[m].shape4[opp] == A)
-			{
-				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
-				undo();
-				if (q < 0) q--;
-				else if (q > 0) q++;
-				return q;
-			}
-		}
-
+		move(fivePoint[opp]);
+		q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+		undo();
+		if (q < 0) q--;
+		else if (q > 0) q++;
+		return q;
 	}
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1) return 3;
@@ -993,23 +986,16 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 	//对方下一步能成五，挡在成五点
 	if (nShape[opp][A] == 1)
 	{
-		for (int m = upperLeft; m < lowerRight; m++)
+		move(fivePoint[opp]);
+		q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
+		undo();
+		if (q < 0) q--;
+		else if (q > 0)
 		{
-			if (board[m].isCand() && board[m].shape4[opp] == A)
-			{
-				move(m);
-				q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint, winPoint);
-				undo();
-				if (q < 0) q--;
-				else if (q > 0)
-				{
-					if (depth == 0) *winPoint = m;
-					q++;
-				}
-				return q;
-			}
+			if (depth == 0) *winPoint = fivePoint[opp];
+			q++;
 		}
-
+		return q;
 	}
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1)
