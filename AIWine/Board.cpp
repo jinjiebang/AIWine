@@ -719,7 +719,7 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	vcfNode++;
 	if (nShape[who][A] >= 1)
 	{
-		if (depth == 0) *winPoint = findPoint(who, A);
+		*winPoint = findPoint(who, A);
 		return 1;
 	}
 	if (nShape[opp][A] >= 2) return -2;
@@ -727,12 +727,12 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
-		q = -vcfSearch(searcher, depth + 1, lastPoint, winPoint);
+		q = -vcfSearch(searcher, depth + 1, lastPoint);
 		undo();
 		if (q < 0) q--;
 		else if (q > 0)
 		{
-			if (depth == 0) *winPoint = fivePoint[opp];
+			*winPoint = fivePoint[opp];
 			q++;
 		}
 		return q;
@@ -740,7 +740,7 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	//本方能成活四,三步胜利
 	if (nShape[who][B] >= 1)
 	{
-		if (depth == 0) *winPoint = findPoint(who, B);
+		*winPoint = findPoint(who, B);
 		return 3;
 	}
 	//本方有冲四活三，尝试
@@ -749,7 +749,7 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 		//对方没有能成四的点，五步胜利
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
-			if (depth == 0) *winPoint = findPoint(who, C);
+			*winPoint = findPoint(who, C);
 			return 5;
 		}
 		for (int m = upperLeft; m < lowerRight; m++)
@@ -757,11 +757,11 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 			if (board[m].isCand() && board[m].shape4[who] == C)
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1,m, winPoint);
+				q = -vcfSearch(searcher, depth + 1,m);
 				undo();
 				if (q > 0)
 				{
-					if (depth == 0) *winPoint = m;
+					*winPoint = m;
 					return q + 1;
 				}
 			}
@@ -776,11 +776,11 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);
-				q = -vcfSearch(searcher, depth + 1,m, winPoint);
+				q = -vcfSearch(searcher, depth + 1, m);
 				undo();
 				if (q > 0)
 				{
-					if (depth == 0) *winPoint = m;
+					*winPoint = m;
 					return q + 1;
 				}
 			}
@@ -791,7 +791,7 @@ int Board::vcfSearch(int searcher, int depth,int lastPoint,int *winPoint)
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
-			if (depth == 0) *winPoint = findPoint(who, G);
+			*winPoint = findPoint(who, G);
 			return 5;
 		}
 	}
