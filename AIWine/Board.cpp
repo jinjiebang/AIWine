@@ -1125,7 +1125,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 				undo();
 				if (q > 0)
 				{
-					*winPoint = m;
+					if (depth == 0) *winPoint = m;
 					return q + 1;
 				}
 			}
