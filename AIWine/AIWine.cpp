@@ -194,13 +194,13 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 		{
 			if (i > 0 && alpha + 1 < beta)
 			{
-				value = -search(depth - 1, -alpha - 1, -alpha);
+				value = -search(depth - 1, -alpha - 1, -alpha,0);
 				if (value <= alpha || value >= beta)
 				{
 					break;
 				}
 			}
-			value = -search(depth - 1, -beta, -alpha);
+			value = -search(depth - 1, -beta, -alpha,0);
 		} while (0);
 		board->undo();
 		if (terminateAI) break;
@@ -218,7 +218,7 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 
 }
 //搜索主函数
-int AIWine::search(int depth, int alpha, int beta)
+int AIWine::search(int depth, int alpha, int beta,int extendsion)
 {
 	static int cnt;
 	if (--cnt<0)
@@ -230,6 +230,12 @@ int AIWine::search(int depth, int alpha, int beta)
 	//简单胜
 	int q = board->quickWinSearch();
 	if (q != 0) return q > 0 ? WinScore : LoseScore;
+	if (board->isExtend()) extendsion++;
+	if (extendsion == 2&&board->ply < MaxDepth)
+	{
+		depth++;
+		extendsion = 0;
+	}
 	//到达叶节点
 	if (depth <= 0)
 	{
@@ -244,7 +250,7 @@ int AIWine::search(int depth, int alpha, int beta)
 			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
 			{
 				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				/*if (board->ply < 6 && eval > alpha && board->vctSearch(board->who, 0, 8, lastPoint) > 0) return WinScore;*/
+				/*if (board->ply <= 3 && eval > alpha && board->vctSearch(board->who, 0, 14, lastPoint) > 0) return WinScore;*/
 			}
 			return eval;
 		}
@@ -273,13 +279,13 @@ int AIWine::search(int depth, int alpha, int beta)
 		{
 			if (i > 0 && alpha + 1 < beta)
 			{
-				value = -search(depth - 1, -alpha - 1, -alpha);
+				value = -search(depth - 1, -alpha - 1, -alpha,extendsion);
 				if (value <= alpha || value >= beta)
 				{
 					break;
 				}
 			}
-			value = -search(depth - 1, -beta, -alpha);
+			value = -search(depth - 1, -beta, -alpha, extendsion);
 		} while (0);
 		board->undo();
 

@@ -63,6 +63,7 @@ public:
 	//内联方法
 	void vctStart() { t_VCT_Start = getTime(); vctStop = false; vctNode = 0; }
 	bool isExpand() { return nShape[opp][A] > 0; }
+	bool isExtend() { return  nShape[opp][A] > 0 || (nShape[opp][B] > 0 && nShape[who][D] + nShape[who][E] + nShape[who][F] == 0); }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }

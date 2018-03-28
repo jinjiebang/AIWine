@@ -24,7 +24,7 @@ public:
 	void turnMove(int x, int y);
 	void turnBest(int &x, int &y);
 	Cand rootSearch(int depth, int alpha, int beta);
-	int search(int depth, int alpha, int beta);
+	int search(int depth, int alpha, int beta,int extension);
 
 	int nSearched;							//每次思考时,搜索的局面数
 	int speed;								//搜索速度
