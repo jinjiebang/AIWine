@@ -43,11 +43,6 @@ public:
 	void generateCand(Cand cand[], int &nCand);
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
-	int evaluateTest();
-	int evaluateTest2();
-	int evaluateTest3();
-	int evaluateDebug3();
-	int evaluateDebug();
 	int quickWinSearch();
 	int vcfSearch(int *winPoint);
 	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
@@ -61,9 +56,11 @@ public:
 	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀
 
 	//内联方法
+	int vcfSearch() { int lastPoint = findLastPoint(); if (lastPoint == -1) return 0; return vcfSearch(who, 0, lastPoint); }
+	int vctSearch(int depth) { int lastPoint = findLastPoint(); if (lastPoint == -1) return 0; vctStart(); return vctSearch(who, 0, depth, lastPoint); }
 	void vctStart() { t_VCT_Start = getTime(); vctStop = false; vctNode = 0; }
 	bool isExpand() { return nShape[opp][A] > 0; }
-	bool isExtend() { return  nShape[opp][A] > 0 || (nShape[opp][B] > 0 && nShape[who][D] + nShape[who][E] + nShape[who][F] == 0); }
+	bool isExtend() { return  nShape[opp][A] > 0; }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }

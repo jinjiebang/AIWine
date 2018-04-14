@@ -231,7 +231,7 @@ int AIWine::search(int depth, int alpha, int beta,int extendsion)
 	int q = board->quickWinSearch();
 	if (q != 0) return q > 0 ? WinScore : LoseScore;
 	if (board->isExtend()) extendsion++;
-	if (extendsion == 2&&board->ply < MaxDepth)
+	if (extendsion == 2 && board->ply < MaxDepth)
 	{
 		depth++;
 		extendsion = 0;
@@ -245,12 +245,11 @@ int AIWine::search(int depth, int alpha, int beta,int extendsion)
 		}
 		else
 		{
-			int lastPoint;
 			int eval = board->evaluate();
-			if (eval < beta && (lastPoint = board->findLastPoint()) != -1)
+			if (eval < beta)
 			{
-				if (board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
-				/*if (board->ply <= 3 && eval > alpha && board->vctSearch(board->who, 0, 14, lastPoint) > 0) return WinScore;*/
+				if (board->vcfSearch() > 0) return WinScore;
+				/*if (board->ply < 6 && board->vctSearch(10) > 0) return WinScore;*/
 			}
 			return eval;
 		}
