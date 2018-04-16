@@ -336,6 +336,269 @@ int Board::evaluate()
 	}
 	return eval[who] - eval[opp] + 70;
 }
+int Board::evaluateTest2()
+{
+	int p;
+	int eval[2] = { 0 };
+	Chess *c;
+	for (int i = 0; i < chessCount; i++)
+	{
+		c = remChess[i];
+		p = c->piece;
+		assert(p == BLACK || p == WHITE);
+		c->updatePiece4();
+		eval[p] += ChessShape::fourShapeScore[c->shape4[p]];
+	}
+	return eval[who] - eval[opp];
+}
+int Board::evaluateTest3()
+{
+	int p, pos;
+	int eval[2] = { 0 };
+	bool record[1024][4] = { 0 };
+	int shape[2][10] = { 0 };
+	int fourShape[2][16] = { 0 };
+	Chess *c;
+	for (int i = 0; i < chessCount; i++)
+	{
+		c = remChess[i];
+		p = c->piece;
+		pos = remPoint[i];
+		
+		for (int k = 0; k < 4; k++)
+		{
+			c->updatePiece1(k);
+			if (record[pos][k]) continue;//已统计过
+			shape[p][c->shape[k][p]]++;
+			//把相关的棋子设为true
+			int newPos = pos;
+			for (int j = 0; j < 4; j++)
+			{
+				newPos += MOV[k];
+				if (board[newPos].piece == p) record[newPos][k] = true;
+				else if (board[newPos].piece != EMPTY) break;
+			}
+			newPos = pos;
+			for (int j = 0; j < 4; j++)
+			{
+				newPos -= MOV[k];
+				if (board[newPos].piece == p) record[newPos][k] = true;
+				else if (board[newPos].piece != EMPTY) break;
+			}
+		}
+		assert(p == BLACK || p == WHITE);
+	}
+	for (int i = 0; i < chessCount; i++)
+	{
+		c = remChess[i];
+		p = c->piece;
+		c->updatePiece4();
+		int temp[10] = { 0 };
+		temp[c->shape[0][p]]++;
+		temp[c->shape[1][p]]++;
+		temp[c->shape[2][p]]++;
+		temp[c->shape[3][p]]++;
+		switch (c->shape4[p])
+		{
+		case K:
+			shape[p][BLOCK3] -= temp[BLOCK3];
+			shape[p][FLEX2] -= temp[FLEX2];
+			fourShape[p][K]++;
+			break;
+		case I:
+			shape[p][FLEX3] --;
+			shape[p][BLOCK2] -= temp[BLOCK2];
+			fourShape[p][I]++;
+			break;
+		case H:
+			shape[p][FLEX3] --;
+			shape[p][FLEX2] -= temp[FLEX2];
+			shape[p][BLOCK3] -= temp[BLOCK3];
+			fourShape[p][H]++;
+			break;
+		case G:
+			shape[p][FLEX3] -= temp[FLEX3];
+			fourShape[p][G]++;
+			break;
+		case E:
+			shape[p][BLOCK4] --;
+			shape[p][BLOCK2] -= temp[BLOCK2];
+			fourShape[p][E]++;
+			break;
+		case D:
+			shape[p][BLOCK4] --;
+			shape[p][BLOCK3] -= temp[BLOCK3];
+			shape[p][FLEX2] -= temp[FLEX2];
+			fourShape[p][D]++;
+			break;
+		case C:
+			shape[p][BLOCK4] --;
+			shape[p][FLEX3] -= temp[FLEX3];
+			fourShape[p][C]++;
+			break;
+		case B:
+			fourShape[p][B]++;
+			if (temp[BLOCK4] >= 2)
+			{
+				shape[p][BLOCK4] -= temp[BLOCK4];
+			}
+		default:
+			break;
+		}
+	}
+	int convert[10] = { 0,0,0,N,M,L,J,F,B,A };
+	for (int i = 1; i < 10; i++)
+	{
+		int index = convert[i];
+		fourShape[0][index] += shape[0][i];
+		fourShape[1][index] += shape[1][i];
+	}
+	for (int i = 1; i < 14; i++)
+	{
+		eval[0] += fourShape[0][i] * ChessShape::fourShapeScore[i];
+		eval[1] += fourShape[1][i] * ChessShape::fourShapeScore[i];
+	}
+	return eval[who] - eval[opp];
+}
+int Board::evaluateDebug3()
+{
+	int p, pos;
+	int eval[2] = { 0 };
+	bool record[1024][4] = { 0 };
+	int shape[2][10] = { 0 };
+	int fourShape[2][16] = { 0 };
+	Chess *c;
+	for (int i = 0; i < chessCount; i++)
+	{
+		c = remChess[i];
+		p = c->piece;
+		pos = remPoint[i];
+
+		for (int k = 0; k < 4; k++)
+		{
+			c->updatePiece1(k);
+			if (record[pos][k]) continue;//已统计过
+			shape[p][c->shape[k][p]]++;
+			//把相关的棋子设为true
+			int newPos = pos;
+			for (int j = 0; j < 4; j++)
+			{
+				newPos += MOV[k];
+				if (board[newPos].piece == p) record[newPos][k] = true;
+				else if (board[newPos].piece != EMPTY) break;
+			}
+			newPos = pos;
+			for (int j = 0; j < 4; j++)
+			{
+				newPos -= MOV[k];
+				if (board[newPos].piece == p) record[newPos][k] = true;
+				else if (board[newPos].piece != EMPTY) break;
+			}
+		}
+		assert(p == BLACK || p == WHITE);
+	}
+	for (int i = 0; i < chessCount; i++)
+	{
+		c = remChess[i];
+		p = c->piece;
+		c->updatePiece4();
+		int temp[10] = { 0 };
+		temp[c->shape[0][p]]++;
+		temp[c->shape[1][p]]++;
+		temp[c->shape[2][p]]++;
+		temp[c->shape[3][p]]++;
+		switch (c->shape4[p])
+		{
+		case K:
+			shape[p][BLOCK3]-=temp[BLOCK3];
+			shape[p][FLEX2]-=temp[FLEX2];
+			fourShape[p][K]++;
+			break;
+		case I:
+			shape[p][FLEX3] --;
+			shape[p][BLOCK2] -= temp[BLOCK2];
+			fourShape[p][I]++;
+			break;
+		case H:
+			shape[p][FLEX3] --;
+			shape[p][FLEX2] -= temp[FLEX2];
+			shape[p][BLOCK3] -= temp[BLOCK3];
+			fourShape[p][H]++;
+			break;
+		case G:
+			shape[p][FLEX3] -= temp[FLEX3];
+			fourShape[p][G]++;
+			break;
+		case E:
+			shape[p][BLOCK4] --;
+			shape[p][BLOCK2] -= temp[BLOCK2];
+			fourShape[p][E]++;
+			break;
+		case D:
+			shape[p][BLOCK4] --;
+			shape[p][BLOCK3] -= temp[BLOCK3];
+			shape[p][FLEX2] -= temp[FLEX2];
+			fourShape[p][D]++;
+			break;
+		case C:
+			shape[p][BLOCK4] --;
+			shape[p][FLEX3] -= temp[FLEX3];
+			fourShape[p][C]++;
+			break;
+		case B:
+			fourShape[p][B]++;
+			if (temp[BLOCK4]>=2)
+			{
+				shape[p][BLOCK4] -= temp[BLOCK4];
+			}
+		default:
+			break;
+		}
+	}
+	int convert[10] = { 0,0,0,N,M,L,J,F,B,A };
+	for (int i = 1; i < 10; i++)
+	{
+		int index = convert[i];
+		fourShape[0][index] += shape[0][i];
+		fourShape[1][index] += shape[1][i];
+	}
+	string name[16] = { "none","眠二","活二","眠三","活二加眠三","活三","活三加眠二","活三加眠三或活二","双活三","冲四","冲四加眠二","冲四加眠三或活二","冲四加活三","活四","连五" ,"禁手" };
+	for (int shape4 = 1; shape4 <14; shape4++)
+	{
+		int whoEval = fourShape[who][shape4] * ChessShape::fourShapeScore[shape4];
+		int oppEval = fourShape[opp][shape4] * ChessShape::fourShapeScore[shape4];
+		if (whoEval != 0) cout << "MESSAGE 本方 棋型：" << name[shape4] << " 个数" << fourShape[who][shape4] << " 分值：" << whoEval << endl;
+		if (oppEval != 0) cout << "MESSAGE 对方 棋型：" << name[shape4] << " 个数" << fourShape[opp][shape4] << " 分值：" << oppEval << endl;
+		eval[who] += whoEval;
+		eval[opp] += oppEval;
+	}
+	return eval[who] - eval[opp];
+}
+int Board::evaluateTest()
+{
+	int eval[2] = { 0 };
+	for (int shape4 = 1; shape4 <15; shape4++)
+	{
+		eval[0] += nShape[0][shape4]*ChessShape::fourShapeScore[shape4];
+		eval[1] += nShape[1][shape4]*ChessShape::fourShapeScore[shape4];
+	}
+	return eval[who] - eval[opp] + 50;
+}
+int Board::evaluateDebug()
+{
+	int eval[2] = { 0 };
+	string name[16] = { "none","none","none","none","活二加眠三","活三","活三加眠二","活三加眠三或活二","双活三","冲四","冲四加眠二","冲四加眠三或活二","冲四加活三","活四","连五" ,"禁手" };
+	for (int shape4 = 1; shape4 <15; shape4++)
+	{
+		int whoEval = nShape[who][shape4] * ChessShape::fourShapeScore[shape4];
+		int oppEval = nShape[opp][shape4] * ChessShape::fourShapeScore[shape4];
+		if (whoEval > 0) cout << "MESSAGE 本方 棋型：" << name[shape4] << " 个数" << nShape[who][shape4] << " 分值：" << whoEval << endl;
+		if (oppEval > 0) cout << "MESSAGE 对方 棋型：" << name[shape4] << " 个数" << nShape[opp][shape4] << " 分值：" << oppEval << endl;
+		eval[who] += whoEval;
+		eval[opp] += oppEval;
+	}
+	return eval[who] - eval[opp];
+}
 
 //胜利局面搜索(将在几步内赢棋)
 int Board::quickWinSearch()
