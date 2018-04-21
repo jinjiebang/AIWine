@@ -148,6 +148,10 @@ int gomocup()
 				cin >> t;
 			}
 		}
+		else if (command == "ABOUT")
+		{
+			cout << "MESSAGE" << " engine name:Wine author: JinJieWang version:2.1 country:China contact:724895582@qq.com" << endl;
+		}
 		else if (command == "END")
 		{
 			delete ai;

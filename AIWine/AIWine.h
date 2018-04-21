@@ -24,7 +24,7 @@ public:
 	void turnMove(int x, int y);
 	void turnBest(int &x, int &y);
 	Cand rootSearch(int depth, int alpha, int beta);
-	int search(int depth, int alpha, int beta,int extension);
+	int search(int depth, int alpha, int beta,int extend);
 
 	int nSearched;							//每次思考时,搜索的局面数
 	int speed;								//搜索速度
@@ -37,11 +37,12 @@ public:
 	long start_time;						//开始时间
 	bool terminateAI;						//停止搜索标志
 	bool isCheckVCT[1024];					//记录是否算过VCT
+	const int delVctLoseDepth = 10;			//删除必败点的VCT深度(每个可能落子都检查)
+	const int checkOppVctDepth = 14;		//检查对方VCT的深度(只检查分最高的点,若有VCT继续向后检查)
 
 	void delLoseCand();
-	void delVctLose();
-	void checkOppVct();
-	void sortCand(Cand cand[], int nCand);
+	int delVctLose();
+	int checkOppVct();
 	void showDepthInfo(int depth, Cand best, long td);
 	long stopTime() { return start_time + __min(timeout_turn, time_left / 7) - 30; }
 	long getTime() { return clock() * 1000 / CLOCKS_PER_SEC; }

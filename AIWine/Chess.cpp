@@ -18,12 +18,7 @@ short Chess::prior(int who)
 	return ChessShape::calPrior(pattern, who);
 }
 //更新单线棋型
-void Chess::updatePiece1(int k)
+void Chess::updateShape()
 {
-	shape[k][piece] = ChessShape::shapeTable[pattern[k][piece]][pattern[k][1-piece]];
-}
-//更新组合棋型
-void Chess::updatePiece4()
-{
-	shape4[piece] = ChessShape::fourShapeTable[shape[0][piece]][shape[1][piece]][shape[2][piece]][shape[3][piece]];
+	update1(0); update1(1); update1(2); update1(3);
 }

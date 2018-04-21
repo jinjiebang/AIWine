@@ -24,9 +24,9 @@ public:
 	int ply;								//当前搜索层数
 	int maxPly;								//实际搜索的最大层数
 	long t_VCT_Start;						//VCT开始搜索时间
+	long t_VCF_Start;						//VCF开始搜索时间
 	int vctNode;							//VCT节点数
 	int vcfNode;							//VCF节点数
-	bool vctStop;							//VCT停止标志
 	const int MAX_VCF_DEPTH = 20;			//最大vcf深度
 	const int MAX_VCT_DEPTH = 16;			//最大vct深度
 	const int MAX_DEFNED_FOUR = 6;			//vct算杀时，算杀方有活三时，防守方最多能冲几个四
@@ -41,29 +41,28 @@ public:
 	void undo();
 	bool check();
 	void generateCand(Cand cand[], int &nCand);
+	void sortCand(Cand cand[], int nCand);
 	void getEmptyCand(Cand cand[], int &nCand);
 	int evaluate();
-	int evaluateTest();
-	int evaluateTest2();
-	int evaluateTest3();
-	int evaluateDebug3();
-	int evaluateDebug();
 	int quickWinSearch();
 	int vcfSearch(int *winPoint);
 	int vcfSearch(int searcher, int depth,int lastPoint,int *winPoint);
 	int vcfSearch(int searcher,int depth,int lastPoint);
 	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint);
 	int vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* winPoint);
-	int vctSearch(int maxDepth, int *winPoint);
 	int vctSearch(int *winPoint);
 	
 	Point findPoint(Piece piece, FourShape shape);
-	Point findLastPoint();		//获得当前下子方，最近刚下的棋型大于活二的点，用于算杀
+	Point findVCFLastPoint();	
+	Point findVCTLastPoint();
 
 	//内联方法
-	void vctStart() { t_VCT_Start = getTime(); vctStop = false; vctNode = 0; }
+	void vctStart() { t_VCT_Start = getTime(); vctNode = 0; }
+	void vcfStart() { t_VCF_Start = getTime(); vcfNode = 0; }
+	long getVCTCost() { return getTime() - t_VCT_Start; }
+	long getVCFCost() { return getTime() - t_VCF_Start; }
 	bool isExpand() { return nShape[opp][A] > 0; }
-	bool isExtend() { return  nShape[opp][A] > 0 || (nShape[opp][B] > 0 && nShape[who][D] + nShape[who][E] + nShape[who][F] == 0); }
+	bool isExtend() { return  nShape[opp][A] > 0 || (nShape[opp][B] > 0 && nShape[who][C] + nShape[who][D] + nShape[who][E] + nShape[who][F] == 0); }
 	int pointPiece(int x, int y) { return board[makePoint(x, y)].piece; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
