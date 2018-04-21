@@ -193,10 +193,11 @@ void AIWine::turnBest(int &x, int &y)
 			
 			board->sortCand(rootCand, nRootCand);
 			if (depth > MinDepth && isCheckVCT[rootBest.point]) continue;
-			checkOppVct();
+			best.point = checkOppVct();
 			cout << "MESSAGE 每层搜索后的VCT花费时间" << board->getVCTCost() << "ms" << endl;
 			if (nRootCand == 0)
 			{
+				rootBest.point = best.point;
 				cout << "MESSAGE 对方VCT必胜!" << endl;
 				break;
 			}
