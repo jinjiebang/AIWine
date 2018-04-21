@@ -150,7 +150,7 @@ int gomocup()
 		}
 		else if (command == "ABOUT")
 		{
-			cout << "MESSAGE" << " engine name:Wine author: JinJieWang version:2.1 country:China contact:724895582@qq.com" << endl;
+			cout << "MESSAGE " << "name = 'Wine', version = '2.1', author = 'JinJieWang', country = 'China'" << endl;
 		}
 		else if (command == "END")
 		{
