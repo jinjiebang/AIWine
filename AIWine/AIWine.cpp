@@ -64,6 +64,7 @@ int AIWine::delVctLose()
 		if (lastPoint != -1 && (result = board->vctSearch(board->who, 0, delVctLoseDepth, lastPoint)) > 0)//对方VCT胜利
 		{
 			c.value = LoseScore;
+			// 如果都是必败，选择拖延步数最长的为最佳点
 			if (isAllLose && result > maxLoseSteps)
 			{
 				maxLoseSteps = result;
@@ -104,6 +105,7 @@ int AIWine::checkOppVct()
 			{
 				c.value = LoseScore;
 				findVct = true;
+				// 如果都是必败，选择拖延步数最长的为最佳点
 				if (isAllLose && result > maxLoseSteps)
 				{
 					maxLoseSteps = result;
