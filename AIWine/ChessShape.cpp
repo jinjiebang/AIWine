@@ -57,11 +57,11 @@ void ChessShape::initShape()
 int ChessShape::checkFive(UCHAR p1, UCHAR p2)
 {
 	int count = 0;
-	for (UCHAR mask = 16; mask != 0 && linePiece(p1, p2, mask) == 2; mask <<= 1)
+	for (UCHAR mask = 16; mask != 0 && isMyStone(p1, p2, mask); mask <<= 1)
 	{
 		count++;
 	}
-	for (UCHAR mask = 8; mask != 0 && linePiece(p1, p2, mask) == 2; mask >>= 1)
+	for (UCHAR mask = 8; mask != 0 && isMyStone(p1, p2, mask); mask >>= 1)
 	{
 		count++;
 	}
@@ -74,7 +74,7 @@ int ChessShape::checkShape(UCHAR p1, UCHAR p2, int nextShape)
 	int count = 0;
 	for (UCHAR mask = 1; mask != 0; mask <<= 1)
 	{
-		if (linePiece(temp1, temp2, mask) == 0)
+		if (isEmpty(temp1,temp2,mask))
 		{
 			putStone(temp1, temp2, mask);
 			if (shapeTable[temp1][temp2] == nextShape) count++;
