@@ -6,7 +6,7 @@
 #include<sstream>
 using namespace std;
 
-//×ª»»³É´óĞ´×ÖÄ¸
+//è½¬æ¢æˆå¤§å†™å­—æ¯
 void toupper(string &str)
 {
 	for (size_t i = 0; i < str.size(); i++)
@@ -150,7 +150,7 @@ int gomocup()
 		}
 		else if (command == "ABOUT")
 		{
-			cout << "MESSAGE " << "name = \"Wine\", version =\"2.1\", author = \"JinJieWang\", country = \"China\"" << endl;
+			cout << "name = \"Wine\", version =\"2.1\", author = \"JinJieWang\", country = \"China\"" << endl;
 		}
 		else if (command == "END")
 		{
@@ -167,7 +167,7 @@ void drawBoard(int board[15][15])
 	{
 		for (int j = 0; j < 15; j++)
 		{
-			//ĞĞÊ×Êä³öĞĞºÅ
+			//è¡Œé¦–è¾“å‡ºè¡Œå·
 			if (j == 0)
 			{
 				if (i + 1 < 10)
@@ -176,7 +176,7 @@ void drawBoard(int board[15][15])
 				}
 				cout << i + 1;
 			}
-			//Êä³öÆåÅÌÄÚÈİ
+			//è¾“å‡ºæ£‹ç›˜å†…å®¹
 			switch (board[i][j])
 			{
 			case 0:
@@ -184,58 +184,58 @@ void drawBoard(int board[15][15])
 				{
 					if (j == 0)
 					{
-						cout << "©°";
+						cout << "â”Œ";
 					}
 					else if (j == 14)
 					{
-						cout << "©´";
+						cout << "â”";
 					}
 					else
 					{
-						cout << "©Ğ";
+						cout << "â”¬";
 					}
 				}
 				else if (i == 14)
 				{
 					if (j == 0)
 					{
-						cout << "©¸";
+						cout << "â””";
 					}
 					else if (j == 14)
 					{
-						cout << "©¼";
+						cout << "â”˜";
 					}
 					else
 					{
-						cout << "©Ø";
+						cout << "â”´";
 					}
 				}
 				else
 				{
 					if (j == 0)
 					{
-						cout << "©À";
+						cout << "â”œ";
 					}
 					else if (j == 14)
 					{
-						cout << "©È";
+						cout << "â”¤";
 					}
 					else
 					{
-						cout << "©à";
+						cout << "â”¼";
 					}
 				}
 				break;
 			case 1:
-				cout << "¡ñ";
+				cout << "â—";
 				break;
 			case 2:
-				cout << "¡ğ";
+				cout << "â—‹";
 				break;
 
 			}
 		}
-		//ĞĞÄ©»»ĞĞ
+		//è¡Œæœ«æ¢è¡Œ
 		cout << endl;
 	}
 	cout << "  A B C D E F G H I J K L M N O" << endl;
@@ -250,7 +250,7 @@ void simpleUI()
 	ai->setSize(15);
 	do
 	{
-		cout << "ÇëÊäÈëÏÂÆå×ø±ê(Èçh8):" << endl;
+		cout << "è¯·è¾“å…¥ä¸‹æ£‹åæ ‡(å¦‚h8):" << endl;
 		string inputStr("");
 		cin >> inputStr;
 		int x, y;
