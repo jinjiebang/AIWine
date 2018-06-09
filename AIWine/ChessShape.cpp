@@ -6,22 +6,7 @@ char ChessShape::shapeTable[256][256] = { 0 };
 short ChessShape::shapePrior[256][256] = { 0 };
 short ChessShape::shapeRank[256][256] = { 0 };
 char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
-/*
-4.活一与眠二：1 
-5.活二：5 
-6.活二加眠一：12
-7.活二加眠二或活一：15
-8.双活二：18
-9.眠三：10
-10.眠三加眠一：12
-11.眠三加眠二或活一：15
-12.眠三加活二：18
-13.活三:10
-14.冲四：20
-15.禁手：0
-*/
-//const int ChessShape::fourShapeScore[16] = { 0,2,8,12,24,100,110,124,200,140,150,180,260,0,0,0 };
-const int ChessShape::fourShapeScore[16] = { 0,0,0,0,1,5,12,15,18,10,12,18,20,15,25,0 };
+
 //初始化棋形
 void ChessShape::initShape()
 {
