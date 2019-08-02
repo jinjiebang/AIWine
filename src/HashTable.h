@@ -2,6 +2,7 @@
 #include "AITypes.h"
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 class HashTable
 {
 

@@ -1,6 +1,6 @@
 #include "ChessShape.h"
 #include<iostream>
-#include<string>
+#include<string.h>
 using namespace std;
 char ChessShape::shapeTable[256][256] = { 0 };
 short ChessShape::shapePrior[256][256] = { 0 };
