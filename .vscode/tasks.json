@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "label": "compile",
+    "type": "shell",
+    "command": ".\\build.bat",
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    }
+}
