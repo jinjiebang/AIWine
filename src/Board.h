@@ -53,8 +53,8 @@ public:
 	int vctSearch(int *winPoint);
 	
 	Point findPoint(Piece piece, FourShape shape);
-	Point findVCFLastPoint();	
-	Point findVCTLastPoint();
+	Point findVCFStartPoint();	
+	Point findVCTStartPoint();
 
 	//内联方法
 	void vctStart() { t_VCT_Start = getTime(); vctNode = 0; }

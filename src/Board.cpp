@@ -395,7 +395,7 @@ Point Board::findPoint(Piece piece, FourShape shape)
 	}
 	return -1;
 }
-Point Board::findVCFLastPoint()
+Point Board::findVCFStartPoint()
 {
 	if (chessCount < 2) return -1;
 	for (int i = chessCount - 2; i >= 0; i -= 2)
@@ -409,7 +409,7 @@ Point Board::findVCFLastPoint()
 	}
 	return -1;
 }
-Point Board::findVCTLastPoint()
+Point Board::findVCTStartPoint()
 {
 	if (chessCount < 2) return -1;
 	for (int i = chessCount - 2; i >= 0; i -= 2)
@@ -426,12 +426,12 @@ Point Board::findVCTLastPoint()
 int Board::vctSearch(int *winPoint)
 {
 	vctStart();
-	int lastPoint,depth, result;
-	if ((lastPoint = findVCTLastPoint()) != -1)
+	int startPoint,depth, result;
+	if ((startPoint = findVCTStartPoint()) != -1)
 	{
 		for (depth = 10; depth <= MAX_VCT_DEPTH; depth += 2)
 		{
-			result = vctSearch(who, 0, depth, lastPoint, winPoint);
+			result = vctSearch(who, 0, depth, startPoint, winPoint);
 			if (result > 0 || (getTime() - t_VCT_Start) * 4 >= MAX_VCT_TIME)
 			{
 				break;
@@ -445,11 +445,11 @@ int Board::vctSearch(int *winPoint)
 }
 int Board::vcfSearch(int *winPoint)
 {
-	int lastPoint, result;
-	if ((lastPoint = findVCFLastPoint()) != -1)
+	int startPoint, result;
+	if ((startPoint = findVCFStartPoint()) != -1)
 	{
 		vcfStart();
-		result = vcfSearch(who, 0, lastPoint, winPoint);
+		result = vcfSearch(who, 0, startPoint, winPoint);
 		long time = getVCFCost();
 		cout << "MESSAGE VCF花费时间：" << time << "ms 节点数：" << vcfNode << endl;
 		return result;
@@ -457,7 +457,7 @@ int Board::vcfSearch(int *winPoint)
 	return 0;
 }
 //VCT搜索
-int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
+int Board::vctSearch(int searcher, int depth, int maxDepth, int startPoint)
 {
 	vctNode++;
 	int q;
@@ -468,7 +468,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
-		q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+		q = -vctSearch(searcher, depth + 1, maxDepth, startPoint);
 		undo();
 		if (q < 0) q--;
 		else if (q > 0) q++;
@@ -490,7 +490,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		{
 			int m = cand[i].point;
 			move(m);
-			q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+			q = -vctSearch(searcher, depth + 1, maxDepth, startPoint);
 			undo();
 			if (q > 0)	//有个防守点能赢，就算赢
 			{
@@ -526,7 +526,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range4)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == D|| board[m].shape4[who] == E))
 			{
 				move(m);
@@ -561,7 +561,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range3)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == H|| board[m].shape4[who] == I))
 			{
 				move(m);
@@ -575,7 +575,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 	return 0;
 }
 //VCT搜索
-int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* winPoint)
+int Board::vctSearch(int searcher, int depth, int maxDepth, int startPoint, int* winPoint)
 {
 	vctNode++;
 	int q;
@@ -590,7 +590,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
-		q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+		q = -vctSearch(searcher, depth + 1, maxDepth, startPoint);
 		undo();
 		if (q < 0) q--;
 		else if (q > 0)
@@ -620,7 +620,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		{
 			int m = cand[i].point;
 			move(m);
-			q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
+			q = -vctSearch(searcher, depth + 1, maxDepth, startPoint);
 			undo();
 			if (q > 0)	//有个防守点能赢，就算赢
 			{
@@ -664,7 +664,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range4)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);
@@ -709,7 +709,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		//后续算杀只考虑米字范围，防止vct爆炸
 		for (int r : Range3)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == H || board[m].shape4[who] == I))
 			{
 				move(m);
@@ -728,7 +728,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 }
 
 //vcf搜索
-int Board::vcfSearch(int searcher, int depth, int lastPoint)
+int Board::vcfSearch(int searcher, int depth, int startPoint)
 {
 	int q;
 	if (nShape[who][A] >= 1) return 1;
@@ -737,7 +737,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
-		q = -vcfSearch(searcher, depth + 1, lastPoint);
+		q = -vcfSearch(searcher, depth + 1, startPoint);
 		undo();
 		if (q < 0) q--; else if (q > 0) q++;
 		return q;
@@ -766,7 +766,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 	{
 		for (int r : Range4)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);
@@ -785,7 +785,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 }
 
 //vcf搜索
-int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
+int Board::vcfSearch(int searcher, int depth, int startPoint, int *winPoint)
 {
 	int q;
 	vcfNode++;
@@ -799,7 +799,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
-		q = -vcfSearch(searcher, depth + 1, lastPoint);
+		q = -vcfSearch(searcher, depth + 1, startPoint);
 		undo();
 		if (q < 0) q--;
 		else if (q > 0)
@@ -844,7 +844,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 	{
 		for (int r : Range4)
 		{
-			int m = lastPoint + r;
+			int m = startPoint + r;
 			if (board[m].isCand() && (board[m].shape4[who] == D || board[m].shape4[who] == E))
 			{
 				move(m);

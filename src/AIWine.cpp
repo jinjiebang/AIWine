@@ -59,7 +59,7 @@ int AIWine::delVctLose()
 	{
 		Cand& c = rootCand[i];
 		board->move(c.point);
-		lastPoint = board->findVCTLastPoint();
+		lastPoint = board->findVCTStartPoint();
 		
 		if (lastPoint != -1 && (result = board->vctSearch(board->who, 0, delVctLoseDepth, lastPoint)) > 0)//对方VCT胜利
 		{
@@ -101,7 +101,7 @@ int AIWine::checkOppVct()
 			isCheckVCT[c.point] = true;
 			board->move(c.point);
 			//对手VCT胜利
-			if ((lastPoint = board->findVCTLastPoint()) != -1 && (result = board->vctSearch(board->who, 0, checkOppVctDepth, lastPoint)) > 0)
+			if ((lastPoint = board->findVCTStartPoint()) != -1 && (result = board->vctSearch(board->who, 0, checkOppVctDepth, lastPoint)) > 0)
 			{
 				c.value = LoseScore;
 				findVct = true;
@@ -289,7 +289,7 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 			int eval = board->evaluate();
 			if (eval < beta)
 			{
-				if ((lastPoint = board->findVCFLastPoint()) != -1 && board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
+				if ((lastPoint = board->findVCFStartPoint()) != -1 && board->vcfSearch(board->who, 0, lastPoint) > 0) return WinScore;
 			}
 			return eval;
 		}
