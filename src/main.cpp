@@ -6,6 +6,7 @@
 #include<sstream>
 using namespace std;
 
+void simpleUI();
 //转换成大写字母
 void toupper(string &str)
 {
@@ -19,12 +20,14 @@ void toupper(string &str)
 	}
 }
 
-int gomocup()
+void gomocup()
 {
 	AIWine* ai= new AIWine();
 	string command;
 	char dot;
 	int size;
+	bool isEnded = false;
+	bool isSimpleUi = false;
 	while (1)
 	{
 		cin >> command;
@@ -154,12 +157,20 @@ int gomocup()
 		}
 		else if (command == "END")
 		{
-			delete ai;
-			exit(0);
-
+			isEnded = true;
+			break;
+		} 
+		else if (command == "SIMPLE_UI") {
+			isSimpleUi = true;
+			break;
 		}
 	}
 	delete ai;
+	if (isEnded) {
+		exit(0);
+	} else if (isSimpleUi) {
+		simpleUI();
+	}
 }
 void drawBoard(int board[15][15])
 {
@@ -273,6 +284,7 @@ void simpleUI()
 }
 int main()
 {
+	system("chcp 65001");
 	gomocup();
-	//simpleUI();
+	return 0;
 }
