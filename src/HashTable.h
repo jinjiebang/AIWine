@@ -12,7 +12,7 @@ public:
 		
 		initHashVal();
 	}
-	//Ìî³äzobristËæ»úÖµ
+	//å¡«å……zobristéšæœºå€¼
 	void initHashVal()
 	{
 		memset(table, 0, sizeof(table));
@@ -23,10 +23,10 @@ public:
 			hashVal[i] = Rand64();
 		}
 	}
-	//²éÑ¯ÖÃ»»±í
+	//æŸ¥è¯¢ç½®æ¢è¡¨
 	int queryRecord(int depth,int alpha,int beta)
 	{
-		//Èç¹ûÊÇpv½Úµã,²»×öÖÃ»»±í½Ø¶Ï
+		//å¦‚æœæ˜¯pvèŠ‚ç‚¹,ä¸åšç½®æ¢è¡¨æˆªæ–­
 	/*	if (beta > alpha + 1) return InvalidVal;*/
 		if (currentItem->key == hashKey)
 		{
@@ -52,7 +52,7 @@ public:
 		}
 		return InvalidVal;
 	}
-	//¼ÇÂ¼¾ÖÃæĞÅÏ¢µ½ÖÃ»»±í
+	//è®°å½•å±€é¢ä¿¡æ¯åˆ°ç½®æ¢è¡¨
 	void   update(int _value, int _depth,int _flag,Point _best)
 	{
 		HashItem* c = currentItem;
@@ -62,7 +62,7 @@ public:
 		c->flag = _flag;
 		c->key = hashKey;
 	}
-	//¸üĞÂµ±Ç°¾ÖÃæµÄhashKeyÒÔ¼°currentItem
+	//æ›´æ–°å½“å‰å±€é¢çš„hashKeyä»¥åŠcurrentItem
 	void move(Point p, Piece who)
 	{
 		hashKey ^= hashVal[p + (who << 10)];

@@ -8,11 +8,11 @@ class  ChessShape
 public:
 	static void initShape();
 	static short calPrior(UCHAR pattern[4][2],int who);
-	static char shapeTable[256][256];	//ÆåĞÍ±í
-	static short shapePrior[256][256];	//ÆåĞÍµÈ¼¶±í
-	static short shapeRank[256][256];	//ÆåĞÍ¹ÀÖµ±í
-	static char fourShapeTable[10][10][10][10];//×éºÏÆåĞÎ±í
-	static const int fourShapeScore[16];	//×éºÏÆåĞÍ·ÖÖµ±í
+	static char shapeTable[256][256];	//æ£‹å‹è¡¨
+	static short shapePrior[256][256];	//æ£‹å‹ç­‰çº§è¡¨
+	static short shapeRank[256][256];	//æ£‹å‹ä¼°å€¼è¡¨
+	static char fourShapeTable[10][10][10][10];//ç»„åˆæ£‹å½¢è¡¨
+	static const int fourShapeScore[16];	//ç»„åˆæ£‹å‹åˆ†å€¼è¡¨
 	
 private:
 	static int getFourShape(int s1, int s2, int s3, int s4);

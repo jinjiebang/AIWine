@@ -6,7 +6,7 @@ Board::Board(HashTable* _hashTable)
 {
 	hashTable = _hashTable;
 }
-//³õÊ¼»¯ÆåÅÌ
+//åˆå§‹åŒ–æ£‹ç›˜
 void Board::initBoard(int size)
 {
 	memset(board, 0, sizeof(board));
@@ -64,10 +64,10 @@ void Board::initBoard(int size)
 	lowerRight = makePoint(4,4);
 	memset(nShape, 0, sizeof(nShape));
 
-	//³õÊ¼»¯Ã××Ö·¶Î§
-	//8¸ö·½Ïò
+	//åˆå§‹åŒ–ç±³å­—èŒƒå›´
+	//8ä¸ªæ–¹å‘
 	const int range[8] = { -1,-31,-32,-33,1,31,32,33 };
-	//8¸ö°ËØÔµã
+	//8ä¸ªå…«å¦ç‚¹
 	const int horse[8] = { -65,-63,-34,-30,30,34,63,65 };
 	int n3 = 0, n4 = 0;
 	for (int i = 1; i <= 3; i++)
@@ -89,7 +89,7 @@ void Board::initBoard(int size)
 		}
 	}
 }
-//Âä×Ó
+//è½å­
 void Board::move(Point p)
 {
 	assert(check());
@@ -117,17 +117,17 @@ void Board::move(Point p)
 	upperLeft = makePoint(x1, y1);
 	lowerRight = makePoint(x2, y2);
 
-	//¸üĞÂÎ»±àÂëÒÔ¼°ÆåĞÍĞÅÏ¢
+	//æ›´æ–°ä½ç¼–ç ä»¥åŠæ£‹å‹ä¿¡æ¯
 	for (int k = 0; k < 4; k++)
 	{
 		Point move_p = p;
-		//pÔÚmove_pµÄÓÒ±ß£¬¸ßÎ»¸üĞÂ
+		//påœ¨move_pçš„å³è¾¹ï¼Œé«˜ä½æ›´æ–°
 		for (UCHAR m = 16; m != 0; m <<= 1)
 		{
 			move_p -= MOV[k];
 			int x = pointX(move_p) - 4;
 			int y = pointY(move_p) - 4;
-			//printf("µã(%d,%d)\n", x, y);
+			//printf("ç‚¹(%d,%d)\n", x, y);
 			board[move_p].pattern[k][who] |= m;
 			if (board[move_p].piece == EMPTY)
 			{
@@ -142,7 +142,7 @@ void Board::move(Point p)
 			}
 		}
 		move_p = p;
-		//pÔÚmove_pµÄ×ó±ß£¬µÍÎ»¸üĞÂ
+		//påœ¨move_pçš„å·¦è¾¹ï¼Œä½ä½æ›´æ–°
 		for (UCHAR m = 8; m != 0; m >>= 1)
 		{
 			move_p += MOV[k];
@@ -160,7 +160,7 @@ void Board::move(Point p)
 			}
 		}
 	}
-	//¸üĞÂ8¸ö·½Ïò£¬Á½²½ÒÔÄÚµÄÆå×ÓÊı
+	//æ›´æ–°8ä¸ªæ–¹å‘ï¼Œä¸¤æ­¥ä»¥å†…çš„æ£‹å­æ•°
 	for (int r:RANGE)
 	{
 		board[p + r].neighbor++;
@@ -170,7 +170,7 @@ void Board::move(Point p)
 	who = oppent(who);
 	opp = oppent(opp);
 }
-//Ìá×Ó
+//æå­
 void Board::undo()
 {
 	assert(check());
@@ -198,11 +198,11 @@ void Board::undo()
 
 	hashTable->move(p, who);
 
-	//¸üĞÂÎ»±àÂëÒÔ¼°ÆåĞÍĞÅÏ¢
+	//æ›´æ–°ä½ç¼–ç ä»¥åŠæ£‹å‹ä¿¡æ¯
 	for (int k = 0; k < 4; k++)
 	{
 		Point move_p = p;
-		//pÔÚmove_pµÄÓÒ±ß£¬¸üĞÂmove_pµÄ¸ßÎ»
+		//påœ¨move_pçš„å³è¾¹ï¼Œæ›´æ–°move_pçš„é«˜ä½
 		for (UCHAR m = 16; m != 0 ; m <<= 1)
 		{
 			move_p -= MOV[k];
@@ -220,7 +220,7 @@ void Board::undo()
 			}
 		}
 		move_p = p;
-		//pÔÚmove_pµÄµÄ×ó±ß£¬¸üĞÂmove_pµÄµÍÎ»
+		//påœ¨move_pçš„çš„å·¦è¾¹ï¼Œæ›´æ–°move_pçš„ä½ä½
 		for (UCHAR m = 8; m != 0; m >>= 1)
 		{
 			move_p += MOV[k];
@@ -238,14 +238,14 @@ void Board::undo()
 			}
 		}
 	}
-	//¸üĞÂ8¸ö·½Ïò£¬Á½²½ÒÔÄÚµÄÆå×ÓÊı
+	//æ›´æ–°8ä¸ªæ–¹å‘ï¼Œä¸¤æ­¥ä»¥å†…çš„æ£‹å­æ•°
 	for (int r:RANGE)
 	{
 		board[p + r].neighbor--;
 	}
 	assert(check());
 }
-//Éú³ÉËùÓĞ·ÖÖ§
+//ç”Ÿæˆæ‰€æœ‰åˆ†æ”¯
 void Board::generateCand(Cand cand[], int& nCand)
 {
 	nCand = 0;
@@ -282,7 +282,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		}
 		assert(false);
 	}
-	//²éÑ¯¹şÏ£±íÖĞµÄ×î¼Ñµã
+	//æŸ¥è¯¢å“ˆå¸Œè¡¨ä¸­çš„æœ€ä½³ç‚¹
 	Point hashMove = 0;
 	if (hashTable->present() && hashTable->depth() >= 0 && hashTable->best() != 0)
 	{
@@ -319,7 +319,7 @@ void Board::generateCand(Cand cand[], int& nCand)
 		assert(nCand <= 256);
 	}
 }
-//¾ÖÃæÆÀ¹À
+//å±€é¢è¯„ä¼°
 int Board::evaluate()
 {
 	int p;
@@ -338,7 +338,7 @@ int Board::evaluate()
 	return eval[who] - eval[opp] + 70;
 }
 
-//Ê¤Àû¾ÖÃæËÑË÷(½«ÔÚ¼¸²½ÄÚÓ®Æå)
+//èƒœåˆ©å±€é¢æœç´¢(å°†åœ¨å‡ æ­¥å†…èµ¢æ£‹)
 int Board::quickWinSearch()
 {
 	int q;
@@ -438,7 +438,7 @@ int Board::vctSearch(int *winPoint)
 			}
 		}
 		long vctTime = getVCTCost();
-		cout << "MESSAGE VCT»¨·ÑÊ±¼ä£º" << vctTime << "ms ½ÚµãÊı£º" << vctNode << " ²ãÊı£º" << __min(depth, MAX_VCT_DEPTH) << endl;
+		cout << "MESSAGE VCTèŠ±è´¹æ—¶é—´ï¼š" << vctTime << "ms èŠ‚ç‚¹æ•°ï¼š" << vctNode << " å±‚æ•°ï¼š" << __min(depth, MAX_VCT_DEPTH) << endl;
 		return result;
 	}
 	return 0;
@@ -451,20 +451,20 @@ int Board::vcfSearch(int *winPoint)
 		vcfStart();
 		result = vcfSearch(who, 0, lastPoint, winPoint);
 		long time = getVCFCost();
-		cout << "MESSAGE VCF»¨·ÑÊ±¼ä£º" << time << "ms ½ÚµãÊı£º" << vcfNode << endl;
+		cout << "MESSAGE VCFèŠ±è´¹æ—¶é—´ï¼š" << time << "ms èŠ‚ç‚¹æ•°ï¼š" << vcfNode << endl;
 		return result;
 	}
 	return 0;
 }
-//VCTËÑË÷
+//VCTæœç´¢
 int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 {
 	vctNode++;
 	int q;
-	//±¾·½ÄÜ³ÉÎå
+	//æœ¬æ–¹èƒ½æˆäº”
 	if (nShape[who][A] >= 1) return 1;
 	if (nShape[opp][A] >= 2) return -2;
-	//¶Ô·½ÏÂÒ»²½ÄÜ³ÉÎå£¬µ²ÔÚ³ÉÎåµã
+	//å¯¹æ–¹ä¸‹ä¸€æ­¥èƒ½æˆäº”ï¼ŒæŒ¡åœ¨æˆäº”ç‚¹
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
@@ -474,11 +474,11 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		else if (q > 0) q++;
 		return q;
 	}
-	//±¾·½ÄÜ³É»îËÄ,Èı²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆæ´»å››,ä¸‰æ­¥èƒœåˆ©
 	if (nShape[who][B] >= 1) return 3;
-	//´óÓÚ×î´óÉî¶È²»ÔÙÀ©Õ¹
+	//å¤§äºæœ€å¤§æ·±åº¦ä¸å†æ‰©å±•
 	if (depth > maxDepth) return 0;
-	//¶Ô·½ÊÇËãÉ±·½ÇÒÄÜ»îËÄ£¬·ÀÊØ
+	//å¯¹æ–¹æ˜¯ç®—æ€æ–¹ä¸”èƒ½æ´»å››ï¼Œé˜²å®ˆ
 	if (who != searcher&&nShape[opp][B] >= 1)
 	{
 		int max_q = -1000;
@@ -492,19 +492,19 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 			move(m);
 			q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
 			undo();
-			if (q > 0)	//ÓĞ¸ö·ÀÊØµãÄÜÓ®£¬¾ÍËãÓ®
+			if (q > 0)	//æœ‰ä¸ªé˜²å®ˆç‚¹èƒ½èµ¢ï¼Œå°±ç®—èµ¢
 			{
 				return q + 1;
 			}
 			else if (q == 0) return 0;
 			else if (q > max_q) max_q = q;
 		}
-		return max_q;//q>0Ê±£¬»áÌáÇ°·µ»Ø£¬Ê£ÏÂµÄÇé¿ö£¬Èç¹ûµÈÓÚ0£¬·µ»Ø0£¬·ñÔò·µ»Ø×î´óµÄqÖµ£¬ËùÒÔÖ±½Ó·µ»Ømax_q¼´¿É
+		return max_q;//q>0æ—¶ï¼Œä¼šæå‰è¿”å›ï¼Œå‰©ä¸‹çš„æƒ…å†µï¼Œå¦‚æœç­‰äº0ï¼Œè¿”å›0ï¼Œå¦åˆ™è¿”å›æœ€å¤§çš„qå€¼ï¼Œæ‰€ä»¥ç›´æ¥è¿”å›max_qå³å¯
 	}
-	//±¾·½ÊÇËãÉ±·½£¬ÓĞ³åËÄ»îÈı£¬³¢ÊÔ
+	//æœ¬æ–¹æ˜¯ç®—æ€æ–¹ï¼Œæœ‰å†²å››æ´»ä¸‰ï¼Œå°è¯•
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
-		//¶Ô·½Ã»ÓĞÄÜ³ÉËÄµÄµã£¬Îå²½Ê¤Àû
+		//å¯¹æ–¹æ²¡æœ‰èƒ½æˆå››çš„ç‚¹ï¼Œäº”æ­¥èƒœåˆ©
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			return 5;
@@ -520,10 +520,10 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 			}
 		}
 	}
-	//±¾·½ÊÇËãÉ±·½,³¢ÊÔÊ£ÏÂµÄËùÓĞ³åËÄµã£¨³ıµô³åËÄ»îÈı)
+	//æœ¬æ–¹æ˜¯ç®—æ€æ–¹,å°è¯•å‰©ä¸‹çš„æ‰€æœ‰å†²å››ç‚¹ï¼ˆé™¤æ‰å†²å››æ´»ä¸‰)
 	if (who == searcher&&nShape[who][D] + nShape[who][E] >= 1)
 	{
-		//ºóĞøËãÉ±Ö»¿¼ÂÇÃ××Ö·¶Î§£¬·ÀÖ¹vct±¬Õ¨
+		//åç»­ç®—æ€åªè€ƒè™‘ç±³å­—èŒƒå›´ï¼Œé˜²æ­¢vctçˆ†ç‚¸
 		for (int r : Range4)
 		{
 			int m = lastPoint + r;
@@ -536,7 +536,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 			}
 		}
 	}
-	//¹¥»÷·½³¢ÊÔË«»îÈı
+	//æ”»å‡»æ–¹å°è¯•åŒæ´»ä¸‰
 	if (who == searcher&&nShape[who][G]>0)
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
@@ -555,10 +555,10 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 		}
 	}
 
-	//³¢ÊÔ»îÈı¼ÓÆäËûÆåĞÍ
+	//å°è¯•æ´»ä¸‰åŠ å…¶ä»–æ£‹å‹
 	if (who == searcher && nShape[who][H] + nShape[who][I] >= 1)
 	{
-		//ºóĞøËãÉ±Ö»¿¼ÂÇÃ××Ö·¶Î§£¬·ÀÖ¹vct±¬Õ¨
+		//åç»­ç®—æ€åªè€ƒè™‘ç±³å­—èŒƒå›´ï¼Œé˜²æ­¢vctçˆ†ç‚¸
 		for (int r : Range3)
 		{
 			int m = lastPoint + r;
@@ -574,19 +574,19 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint)
 
 	return 0;
 }
-//VCTËÑË÷
+//VCTæœç´¢
 int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* winPoint)
 {
 	vctNode++;
 	int q;
-	//±¾·½ÄÜ³ÉÎå
+	//æœ¬æ–¹èƒ½æˆäº”
 	if (nShape[who][A] >= 1)
 	{
 		*winPoint = findPoint(who, A);
 		return 1;
 	}
 	if (nShape[opp][A] >= 2) return -2;
-	//¶Ô·½ÏÂÒ»²½ÄÜ³ÉÎå£¬µ²ÔÚ³ÉÎåµã
+	//å¯¹æ–¹ä¸‹ä¸€æ­¥èƒ½æˆäº”ï¼ŒæŒ¡åœ¨æˆäº”ç‚¹
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
@@ -600,15 +600,15 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		}
 		return q;
 	}
-	//±¾·½ÄÜ³É»îËÄ,Èı²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆæ´»å››,ä¸‰æ­¥èƒœåˆ©
 	if (nShape[who][B] >= 1)
 	{
 		*winPoint = findPoint(who, B);
 		return 3;
 	}
-	//´óÓÚ×î´óÉî¶È£¬²»ÔÙÀ©Õ¹
+	//å¤§äºæœ€å¤§æ·±åº¦ï¼Œä¸å†æ‰©å±•
 	if (depth > maxDepth) return 0;
-	//¶Ô·½ÊÇËãÉ±·½ÇÒÄÜ»îËÄ£¬·ÀÊØ
+	//å¯¹æ–¹æ˜¯ç®—æ€æ–¹ä¸”èƒ½æ´»å››ï¼Œé˜²å®ˆ
 	if (who != searcher&&nShape[opp][B] >= 1)
 	{
 		int max_q = -1000;
@@ -622,7 +622,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 			move(m);
 			q = -vctSearch(searcher, depth + 1, maxDepth, lastPoint);
 			undo();
-			if (q > 0)	//ÓĞ¸ö·ÀÊØµãÄÜÓ®£¬¾ÍËãÓ®
+			if (q > 0)	//æœ‰ä¸ªé˜²å®ˆç‚¹èƒ½èµ¢ï¼Œå°±ç®—èµ¢
 			{
 				*winPoint = m;
 				return q + 1;
@@ -630,12 +630,12 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 			else if (q == 0) return 0;
 			else if (q > max_q) max_q = q;
 		}
-		return max_q;//q>0Ê±£¬»áÌáÇ°·µ»Ø£¬Ê£ÏÂµÄÇé¿ö£¬Èç¹ûµÈÓÚ0£¬·µ»Ø0£¬·ñÔò·µ»Ø×î´óµÄqÖµ£¬ËùÒÔÖ±½Ó·µ»Ømax_q¼´¿É
+		return max_q;//q>0æ—¶ï¼Œä¼šæå‰è¿”å›ï¼Œå‰©ä¸‹çš„æƒ…å†µï¼Œå¦‚æœç­‰äº0ï¼Œè¿”å›0ï¼Œå¦åˆ™è¿”å›æœ€å¤§çš„qå€¼ï¼Œæ‰€ä»¥ç›´æ¥è¿”å›max_qå³å¯
 	}
-	//±¾·½ÊÇËãÉ±·½£¬ÓĞ³åËÄ»îÈı£¬³¢ÊÔ
+	//æœ¬æ–¹æ˜¯ç®—æ€æ–¹ï¼Œæœ‰å†²å››æ´»ä¸‰ï¼Œå°è¯•
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
-		//¶Ô·½Ã»ÓĞÄÜ³ÉËÄµÄµã£¬Îå²½Ê¤Àû
+		//å¯¹æ–¹æ²¡æœ‰èƒ½æˆå››çš„ç‚¹ï¼Œäº”æ­¥èƒœåˆ©
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			*winPoint = findPoint(who, C);
@@ -658,10 +658,10 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		}
 	}
 	
-	//±¾·½ÊÇËãÉ±·½,³¢ÊÔÊ£ÏÂµÄËùÓĞ³åËÄµã£¨³ıµô³åËÄ»îÈı)
+	//æœ¬æ–¹æ˜¯ç®—æ€æ–¹,å°è¯•å‰©ä¸‹çš„æ‰€æœ‰å†²å››ç‚¹ï¼ˆé™¤æ‰å†²å››æ´»ä¸‰)
 	if (who == searcher&&nShape[who][D] + nShape[who][E] >= 1)
 	{
-		//ºóĞøËãÉ±Ö»¿¼ÂÇÃ××Ö·¶Î§£¬·ÀÖ¹vct±¬Õ¨
+		//åç»­ç®—æ€åªè€ƒè™‘ç±³å­—èŒƒå›´ï¼Œé˜²æ­¢vctçˆ†ç‚¸
 		for (int r : Range4)
 		{
 			int m = lastPoint + r;
@@ -679,7 +679,7 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 			}
 		}
 	}
-	//¹¥»÷·½³¢ÊÔË«»îÈı
+	//æ”»å‡»æ–¹å°è¯•åŒæ´»ä¸‰
 	if (who == searcher&&nShape[who][G]>0)
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
@@ -703,10 +703,10 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 		}
 	}
 
-	//³¢ÊÔ»îÈı¼ÓÆäËûÆåĞÍ
+	//å°è¯•æ´»ä¸‰åŠ å…¶ä»–æ£‹å‹
 	if (who == searcher && nShape[who][H] + nShape[who][I] >= 1)
 	{
-		//ºóĞøËãÉ±Ö»¿¼ÂÇÃ××Ö·¶Î§£¬·ÀÖ¹vct±¬Õ¨
+		//åç»­ç®—æ€åªè€ƒè™‘ç±³å­—èŒƒå›´ï¼Œé˜²æ­¢vctçˆ†ç‚¸
 		for (int r : Range3)
 		{
 			int m = lastPoint + r;
@@ -727,13 +727,13 @@ int Board::vctSearch(int searcher, int depth, int maxDepth, int lastPoint, int* 
 	return 0;
 }
 
-//vcfËÑË÷
+//vcfæœç´¢
 int Board::vcfSearch(int searcher, int depth, int lastPoint)
 {
 	int q;
 	if (nShape[who][A] >= 1) return 1;
 	if (nShape[opp][A] >= 2) return -2;
-	//¶Ô·½ÏÂÒ»²½ÄÜ³ÉÎå£¬µ²ÔÚ³ÉÎåµã
+	//å¯¹æ–¹ä¸‹ä¸€æ­¥èƒ½æˆäº”ï¼ŒæŒ¡åœ¨æˆäº”ç‚¹
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
@@ -742,12 +742,12 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 		if (q < 0) q--; else if (q > 0) q++;
 		return q;
 	}
-	//±¾·½ÄÜ³É»îËÄ,Èı²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆæ´»å››,ä¸‰æ­¥èƒœåˆ©
 	if (nShape[who][B] >= 1) return 3;
-	//±¾·½ÓĞ³åËÄ»îÈı£¬³¢ÊÔ
+	//æœ¬æ–¹æœ‰å†²å››æ´»ä¸‰ï¼Œå°è¯•
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
-		//¶Ô·½Ã»ÓĞÄÜ³ÉËÄµÄµã£¬Îå²½Ê¤Àû
+		//å¯¹æ–¹æ²¡æœ‰èƒ½æˆå››çš„ç‚¹ï¼Œäº”æ­¥èƒœåˆ©
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0) return 5;
 		for (int m = upperLeft; m < lowerRight; m++)
 		{
@@ -761,7 +761,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 			}
 		}
 	}
-	//±¾·½ÓĞ³åËÄºÍÆäËûÆåĞÍ(»î¶ş¡¢ÃßÈı¡¢Ãß¶şÖĞµÄÒ»‚€)
+	//æœ¬æ–¹æœ‰å†²å››å’Œå…¶ä»–æ£‹å‹(æ´»äºŒã€çœ ä¸‰ã€çœ äºŒä¸­çš„ä¸€å€‹)
 	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] + nShape[who][E] >= 1)
 	{
 		for (int r : Range4)
@@ -776,7 +776,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 			}
 		}
 	}
-	//±¾·½ÄÜ³ÉË«»îÈı£¬¶Ô·½Ã»ÓĞÈÎºÎ³åËÄ»ò»îËÄ,Îå²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆåŒæ´»ä¸‰ï¼Œå¯¹æ–¹æ²¡æœ‰ä»»ä½•å†²å››æˆ–æ´»å››,äº”æ­¥èƒœåˆ©
 	if (who == searcher&&nShape[who][G] >= 1)
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0) return 5;
@@ -784,7 +784,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint)
 	return 0;
 }
 
-//vcfËÑË÷
+//vcfæœç´¢
 int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 {
 	int q;
@@ -795,7 +795,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 		return 1;
 	}
 	if (nShape[opp][A] >= 2) return -2;
-	//¶Ô·½ÏÂÒ»²½ÄÜ³ÉÎå£¬µ²ÔÚ³ÉÎåµã
+	//å¯¹æ–¹ä¸‹ä¸€æ­¥èƒ½æˆäº”ï¼ŒæŒ¡åœ¨æˆäº”ç‚¹
 	if (nShape[opp][A] == 1)
 	{
 		move(fivePoint[opp]);
@@ -809,16 +809,16 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 		}
 		return q;
 	}
-	//±¾·½ÄÜ³É»îËÄ,Èı²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆæ´»å››,ä¸‰æ­¥èƒœåˆ©
 	if (nShape[who][B] >= 1)
 	{
 		*winPoint = findPoint(who, B);
 		return 3;
 	}
-	//±¾·½ÓĞ³åËÄ»îÈı£¬³¢ÊÔ
+	//æœ¬æ–¹æœ‰å†²å››æ´»ä¸‰ï¼Œå°è¯•
 	if (who == searcher&&nShape[who][C] >= 1)
 	{
-		//¶Ô·½Ã»ÓĞÄÜ³ÉËÄµÄµã£¬Îå²½Ê¤Àû
+		//å¯¹æ–¹æ²¡æœ‰èƒ½æˆå››çš„ç‚¹ï¼Œäº”æ­¥èƒœåˆ©
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
 		{
 			*winPoint = findPoint(who, C);
@@ -839,7 +839,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 			}
 		}
 	}
-	//±¾·½ÓĞ³åËÄºÍÆäËûÆåĞÍ(»î¶ş¡¢ÃßÈı¡¢Ãß¶şÖĞµÄÒ»‚€)
+	//æœ¬æ–¹æœ‰å†²å››å’Œå…¶ä»–æ£‹å‹(æ´»äºŒã€çœ ä¸‰ã€çœ äºŒä¸­çš„ä¸€å€‹)
 	if (who == searcher&&depth<MAX_VCF_DEPTH && nShape[who][D] + nShape[who][E] >= 1)
 	{
 		for (int r : Range4)
@@ -858,7 +858,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 			}
 		}
 	}
-	//±¾·½ÄÜ³ÉË«»îÈı£¬¶Ô·½Ã»ÓĞÈÎºÎ³åËÄ»ò»îËÄ,Îå²½Ê¤Àû
+	//æœ¬æ–¹èƒ½æˆåŒæ´»ä¸‰ï¼Œå¯¹æ–¹æ²¡æœ‰ä»»ä½•å†²å››æˆ–æ´»å››,äº”æ­¥èƒœåˆ©
 	if (who == searcher&&nShape[who][G] >= 1)
 	{
 		if (nShape[opp][B] == 0 && nShape[opp][C] == 0 && nShape[opp][D] == 0 && nShape[opp][E] == 0 && nShape[opp][F] == 0)
@@ -871,7 +871,7 @@ int Board::vcfSearch(int searcher, int depth, int lastPoint, int *winPoint)
 }
 
 
-//»ñÈ¡ËùÓĞ¿ÕµÄµã
+//è·å–æ‰€æœ‰ç©ºçš„ç‚¹
 void Board::getEmptyCand(Cand cand[], int &nCand)
 {
 	for (int m = upperLeft; m < lowerRight; m++)
@@ -882,7 +882,7 @@ void Board::getEmptyCand(Cand cand[], int &nCand)
 		}
 	}
 }
-//¼ì²éÆåĞÍÊıÁ¿ÊÇ·ñÕıÈ·
+//æ£€æŸ¥æ£‹å‹æ•°é‡æ˜¯å¦æ­£ç¡®
 bool Board::check()
 {
 	int n[2][10] = { 0 };
@@ -902,7 +902,7 @@ bool Board::check()
 			}
 	return true;
 }
-//ÅÅĞòÑ¡µã
+//æ’åºé€‰ç‚¹
 void Board::sortCand(Cand cand[], int nCand)
 {
 	Cand key;

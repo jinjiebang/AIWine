@@ -13,7 +13,7 @@ AIWine::~AIWine()
 	delete hashTable;
 	delete board;
 }
-//ÉèÖÃÆåÅÌ³ß´ç
+//è®¾ç½®æ£‹ç›˜å°ºå¯¸
 bool AIWine::setSize(int size)
 {
 	if (size<5 || size>MaxSize)
@@ -23,30 +23,30 @@ bool AIWine::setSize(int size)
 	board->initBoard(size);
 	return true;
 }
-//ÖØĞÂ¿ªÊ¼
+//é‡æ–°å¼€å§‹
 void AIWine::restart()
 {
 	board->initBoard(board->boardSize);
 }
-//»ÚÆå
+//æ‚”æ£‹
 void AIWine::turnUndo()
 {
 	board->undo();
 }
-//ÏÔÊ¾ËÑË÷µÄĞÅÏ¢
+//æ˜¾ç¤ºæœç´¢çš„ä¿¡æ¯
 void AIWine::showDepthInfo(int depth,Cand best, long td)
 {
 	cout << "MESSAGE depth: " << depth << "-" << board->maxPly
 		<< " best:[" << pointX(best.point) - 4 << "," << pointY(best.point) - 4 << "]"
 		<< " val=" << best.value << " time:" << td << "ms" << endl;
 }
-//Âä×Ó
+//è½å­
 void AIWine::turnMove(int x, int y)
 {
 	int point = makePoint(x + 4, y + 4);
 	board->move(point);
 }
-//É¾³ı»á±»VCTÊ¤µÄµã,
+//åˆ é™¤ä¼šè¢«VCTèƒœçš„ç‚¹,
 int AIWine::delVctLose()
 {
 	int lastPoint, result;
@@ -61,10 +61,10 @@ int AIWine::delVctLose()
 		board->move(c.point);
 		lastPoint = board->findVCTLastPoint();
 		
-		if (lastPoint != -1 && (result = board->vctSearch(board->who, 0, delVctLoseDepth, lastPoint)) > 0)//¶Ô·½VCTÊ¤Àû
+		if (lastPoint != -1 && (result = board->vctSearch(board->who, 0, delVctLoseDepth, lastPoint)) > 0)//å¯¹æ–¹VCTèƒœåˆ©
 		{
 			c.value = LoseScore;
-			// Èç¹û¶¼ÊÇ±Ø°Ü£¬Ñ¡ÔñÍÏÑÓ²½Êı×î³¤µÄÎª×î¼Ñµã
+			// å¦‚æœéƒ½æ˜¯å¿…è´¥ï¼Œé€‰æ‹©æ‹–å»¶æ­¥æ•°æœ€é•¿çš„ä¸ºæœ€ä½³ç‚¹
 			if (isAllLose && result > maxLoseSteps)
 			{
 				maxLoseSteps = result;
@@ -84,7 +84,7 @@ int AIWine::delVctLose()
 	delLoseCand();
 	return bestPoint;
 }
-//¼ì²é¶Ô·½VCT,´Ó·ÖÊı×î¸ßµÄµã¿ªÊ¼ËãVCT,Ö±µ½ÕÒµ½Ò»¸ö²»°ÜµÄµã
+//æ£€æŸ¥å¯¹æ–¹VCT,ä»åˆ†æ•°æœ€é«˜çš„ç‚¹å¼€å§‹ç®—VCT,ç›´åˆ°æ‰¾åˆ°ä¸€ä¸ªä¸è´¥çš„ç‚¹
 int AIWine::checkOppVct()
 {
 	int lastPoint, result, index = 0, maxLoseSteps = 0;
@@ -100,12 +100,12 @@ int AIWine::checkOppVct()
 		{
 			isCheckVCT[c.point] = true;
 			board->move(c.point);
-			//¶ÔÊÖVCTÊ¤Àû
+			//å¯¹æ‰‹VCTèƒœåˆ©
 			if ((lastPoint = board->findVCTLastPoint()) != -1 && (result = board->vctSearch(board->who, 0, checkOppVctDepth, lastPoint)) > 0)
 			{
 				c.value = LoseScore;
 				findVct = true;
-				// Èç¹û¶¼ÊÇ±Ø°Ü£¬Ñ¡ÔñÍÏÑÓ²½Êı×î³¤µÄÎª×î¼Ñµã
+				// å¦‚æœéƒ½æ˜¯å¿…è´¥ï¼Œé€‰æ‹©æ‹–å»¶æ­¥æ•°æœ€é•¿çš„ä¸ºæœ€ä½³ç‚¹
 				if (isAllLose && result > maxLoseSteps)
 				{
 					maxLoseSteps = result;
@@ -127,7 +127,7 @@ int AIWine::checkOppVct()
 	delLoseCand();
 	return bestPoint;
 }
-//»ñÈ¡×î¼Ñµã
+//è·å–æœ€ä½³ç‚¹
 void AIWine::turnBest(int &x, int &y)
 {
 	Cand best;
@@ -146,19 +146,19 @@ void AIWine::turnBest(int &x, int &y)
 	nSearched = 0;
 
 	bool isSolved = false;
-	//ÏÈËãvcf
+	//å…ˆç®—vcf
 	if (board->vcfSearch(&rootBest.point) > 0)
 	{
 		isSolved = true;
-		cout << "MESSAGE VCFËãÉ±³É¹¦£¡±ØÊ¤µã["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
+		cout << "MESSAGE VCFç®—æ€æˆåŠŸï¼å¿…èƒœç‚¹["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
 	}
-	//ÔÙËãvct
+	//å†ç®—vct
 	if (!isSolved&&board->vctSearch(&rootBest.point) > 0)
 	{
 		isSolved = true;
-		cout << "MESSAGE VCTËãÉ±³É¹¦£¡±ØÊ¤µã[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
+		cout << "MESSAGE VCTç®—æ€æˆåŠŸï¼å¿…èƒœç‚¹[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
 	}
-	//Ëã¶Ô·½µÄVCT,É¾³ı¶Ô·½ÄÜVCTÊ¤µÄµã
+	//ç®—å¯¹æ–¹çš„VCT,åˆ é™¤å¯¹æ–¹èƒ½VCTèƒœçš„ç‚¹
 	if (!isSolved)
 	{
 		board->generateCand(rootCand, nRootCand);
@@ -168,12 +168,12 @@ void AIWine::turnBest(int &x, int &y)
 		{
 			isSolved = true;
 			rootBest.point = bestPoint;
-			cout << "MESSAGE ¶Ô·½VCT±ØÊ¤!"<< endl;
+			cout << "MESSAGE å¯¹æ–¹VCTå¿…èƒœ!"<< endl;
 		}
 		else if (nRootCand == 1)
 		{
-			//ÕâÀïÃ»ÓĞ°ÑisSolvedÉèÎªtrue,ÊÇÏëÍ¨¹ıËÑË÷À´¸ø³öÒ»¸öÆÀ¼Û·Ö
-			cout << "MESSAGE Í¨¹ıVCTËÑË÷µ½Î¨Ò»Âä×Ó!" << endl;
+			//è¿™é‡Œæ²¡æœ‰æŠŠisSolvedè®¾ä¸ºtrue,æ˜¯æƒ³é€šè¿‡æœç´¢æ¥ç»™å‡ºä¸€ä¸ªè¯„ä»·åˆ†
+			cout << "MESSAGE é€šè¿‡VCTæœç´¢åˆ°å”¯ä¸€è½å­!" << endl;
 		}
 	}
 	if (!isSolved)
@@ -196,16 +196,16 @@ void AIWine::turnBest(int &x, int &y)
 			board->sortCand(rootCand, nRootCand);
 			if (depth > MinDepth && isCheckVCT[rootBest.point]) continue;
 			best.point = checkOppVct();
-			cout << "MESSAGE Ã¿²ãËÑË÷ºóµÄVCT»¨·ÑÊ±¼ä" << board->getVCTCost() << "ms" << endl;
+			cout << "MESSAGE æ¯å±‚æœç´¢åçš„VCTèŠ±è´¹æ—¶é—´" << board->getVCTCost() << "ms" << endl;
 			if (nRootCand == 0)
 			{
 				rootBest.point = best.point;
-				cout << "MESSAGE ¶Ô·½VCT±ØÊ¤!" << endl;
+				cout << "MESSAGE å¯¹æ–¹VCTå¿…èƒœ!" << endl;
 				break;
 			}
 			else if (nRootCand == 1)
 			{
-				cout << "MESSAGE Í¨¹ıVCTËÑË÷µ½Î¨Ò»Âä×Ó!" << endl;
+				cout << "MESSAGE é€šè¿‡VCTæœç´¢åˆ°å”¯ä¸€è½å­!" << endl;
 				rootBest = rootCand[0];
 				break;
 			}
@@ -218,7 +218,7 @@ void AIWine::turnBest(int &x, int &y)
 	assert(isValidPos(x, y));
 	turnMove(x, y);
 }
-//¸ù½ÚµãËÑË÷
+//æ ¹èŠ‚ç‚¹æœç´¢
 Cand AIWine::rootSearch(int depth, int alpha, int beta)
 {
 	Cand best = Cand(0, alpha - 1);
@@ -253,7 +253,7 @@ Cand AIWine::rootSearch(int depth, int alpha, int beta)
 	return best;
 
 }
-//ËÑË÷Ö÷º¯Êı
+//æœç´¢ä¸»å‡½æ•°
 int AIWine::search(int depth, int alpha, int beta,int extend)
 {
 	static int cnt;
@@ -263,10 +263,10 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 		if (getTime() - stopTime() > 0) terminateAI = true;
 	}
 	nSearched++;
-	//¼òµ¥Ê¤
+	//ç®€å•èƒœ
 	int q = board->quickWinSearch();
 	if (q != 0) return q > 0 ? WinScore : LoseScore;
-	//ÀÛ¼ÆÁ½´Î³åËÄ»òÔÚ¶Ô·½Ã»ÓĞ³åËÄµãµÄÇé¿öÏÂ»îÈı£¬ÑÓÉìÒ»²ã
+	//ç´¯è®¡ä¸¤æ¬¡å†²å››æˆ–åœ¨å¯¹æ–¹æ²¡æœ‰å†²å››ç‚¹çš„æƒ…å†µä¸‹æ´»ä¸‰ï¼Œå»¶ä¼¸ä¸€å±‚
 	if (board->isExtend()) 
 	{
 		extend++;
@@ -276,7 +276,7 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 			depth++;
 		}
 	}
-	//µ½´ïÒ¶½Úµã
+	//åˆ°è¾¾å¶èŠ‚ç‚¹
 	if (depth <= 0)
 	{
 		if (board->isExpand())
@@ -347,7 +347,7 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 	}
 	return alpha;
 }
-//É¾³ı±Ø°Üµã
+//åˆ é™¤å¿…è´¥ç‚¹
 void AIWine::delLoseCand()
 {
 	for (int i = nRootCand - 1; i >= 0; i--)
@@ -363,7 +363,7 @@ void AIWine::delLoseCand()
 	}
 }
 
-//ÅĞ¶Ï×ø±êÊÇ·ñÓĞĞ§
+//åˆ¤æ–­åæ ‡æ˜¯å¦æœ‰æ•ˆ
 bool AIWine::isValidPos(int x, int y)
 {
 	int size = board->boardSize;

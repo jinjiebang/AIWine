@@ -26,19 +26,19 @@ public:
 	Cand rootSearch(int depth, int alpha, int beta);
 	int search(int depth, int alpha, int beta,int extend);
 
-	int nSearched;							//Ã¿´ÎË¼¿¼Ê±,ËÑË÷µÄ¾ÖÃæÊı
-	int speed;								//ËÑË÷ËÙ¶È
-	Cand rootBest;							//¸ù½Úµã·µ»ØµÄ×î¼Ñµã
-	Cand rootCand[MaxCand];					//¸ù½Úµã·ÖÖ§
-	int nRootCand;							//¸ù½Úµã·ÖÖ§Êı
-	int timeout_turn;						//²½Ê±
-	int timeout_match;						//¾ÖÊ±
-	int time_left;							//Ê£ÓàÊ±¼ä
-	long start_time;						//¿ªÊ¼Ê±¼ä
-	bool terminateAI;						//Í£Ö¹ËÑË÷±êÖ¾
-	bool isCheckVCT[1024];					//¼ÇÂ¼ÊÇ·ñËã¹ıVCT
-	const int delVctLoseDepth = 10;			//É¾³ı±Ø°ÜµãµÄVCTÉî¶È(Ã¿¸ö¿ÉÄÜÂä×Ó¶¼¼ì²é)
-	const int checkOppVctDepth = 14;		//¼ì²é¶Ô·½VCTµÄÉî¶È(Ö»¼ì²é·Ö×î¸ßµÄµã,ÈôÓĞVCT¼ÌĞøÏòºó¼ì²é)
+	int nSearched;							//æ¯æ¬¡æ€è€ƒæ—¶,æœç´¢çš„å±€é¢æ•°
+	int speed;								//æœç´¢é€Ÿåº¦
+	Cand rootBest;							//æ ¹èŠ‚ç‚¹è¿”å›çš„æœ€ä½³ç‚¹
+	Cand rootCand[MaxCand];					//æ ¹èŠ‚ç‚¹åˆ†æ”¯
+	int nRootCand;							//æ ¹èŠ‚ç‚¹åˆ†æ”¯æ•°
+	int timeout_turn;						//æ­¥æ—¶
+	int timeout_match;						//å±€æ—¶
+	int time_left;							//å‰©ä½™æ—¶é—´
+	long start_time;						//å¼€å§‹æ—¶é—´
+	bool terminateAI;						//åœæ­¢æœç´¢æ ‡å¿—
+	bool isCheckVCT[1024];					//è®°å½•æ˜¯å¦ç®—è¿‡VCT
+	const int delVctLoseDepth = 10;			//åˆ é™¤å¿…è´¥ç‚¹çš„VCTæ·±åº¦(æ¯ä¸ªå¯èƒ½è½å­éƒ½æ£€æŸ¥)
+	const int checkOppVctDepth = 14;		//æ£€æŸ¥å¯¹æ–¹VCTçš„æ·±åº¦(åªæ£€æŸ¥åˆ†æœ€é«˜çš„ç‚¹,è‹¥æœ‰VCTç»§ç»­å‘åæ£€æŸ¥)
 
 	void delLoseCand();
 	int delVctLose();

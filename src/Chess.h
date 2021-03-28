@@ -9,7 +9,7 @@ public:
 	void updateShape();
 
 	char piece;
-	char neighbor;		//8¸ö·½ÏòÉÏÁ½¸ñÄÚµÄÆå×ÓÊı
+	char neighbor;		//8ä¸ªæ–¹å‘ä¸Šä¸¤æ ¼å†…çš„æ£‹å­æ•°
 	UCHAR pattern[4][2];
 	UCHAR shape[4][2];
 	UCHAR shape4[2];

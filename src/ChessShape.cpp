@@ -7,7 +7,7 @@ short ChessShape::shapePrior[256][256] = { 0 };
 short ChessShape::shapeRank[256][256] = { 0 };
 char ChessShape::fourShapeTable[10][10][10][10] = { 0 };
 
-//³õÊ¼»¯ÆåĞÎ
+//åˆå§‹åŒ–æ£‹å½¢
 void ChessShape::initShape()
 {
 	memset(shapeTable, 0, sizeof(shapeTable));
@@ -36,7 +36,7 @@ void ChessShape::initShape()
 			}
 		}
 	}
-	//³õÊ¼»¯ÆåĞÍµÈ¼¶±í
+	//åˆå§‹åŒ–æ£‹å‹ç­‰çº§è¡¨
 	for (int i = 0; i < 256; i++)
 		for (int j = 0; j < 256; j++)
 		{
@@ -45,7 +45,7 @@ void ChessShape::initShape()
 		}
 			
 		
-	//³õÊ¼»¯×éºÏÆåĞÎ±í
+	//åˆå§‹åŒ–ç»„åˆæ£‹å½¢è¡¨
 	for (int i = 0; i < 10; i++)
 		for (int j = 0; j < 10; j++)
 			for (int k = 0; k < 10; k++)
@@ -53,7 +53,7 @@ void ChessShape::initShape()
 					fourShapeTable[i][j][k][l] = getFourShape(i, j, k, l);
 
 }
-//ÅĞ¶ÏÁ¬Îå
+//åˆ¤æ–­è¿äº”
 int ChessShape::checkFive(UCHAR p1, UCHAR p2)
 {
 	int count = 0;
@@ -67,7 +67,7 @@ int ChessShape::checkFive(UCHAR p1, UCHAR p2)
 	}
 	return count >= 4 ? FIVE : NONE;
 }
-//ÅĞ¶ÏÆäËûÆåĞÍ
+//åˆ¤æ–­å…¶ä»–æ£‹å‹
 int ChessShape::checkShape(UCHAR p1, UCHAR p2, int nextShape)
 {
 	UCHAR temp1 = p1, temp2 = p2;
@@ -94,7 +94,7 @@ int ChessShape::checkShape(UCHAR p1, UCHAR p2, int nextShape)
 	}
 	return NONE;
 }
-//»ñÈ¡×éºÏÆåĞÍ
+//è·å–ç»„åˆæ£‹å‹
 int ChessShape::getFourShape(int s1, int s2, int s3, int s4)
 {
 	int n[10] = { 0 };
@@ -121,7 +121,7 @@ int ChessShape::getFourShape(int s1, int s2, int s3, int s4)
 	return 0;
 }
 
-//»ñÈ¡pµÄ¶ş½øÖÆ±àÂëÖĞ1µÄ¸öÊı
+//è·å–pçš„äºŒè¿›åˆ¶ç¼–ç ä¸­1çš„ä¸ªæ•°
 UCHAR ChessShape::bitCount(UCHAR p)
 {
 	p = (p & 0x55) + ((p >> 1) & 0x55);
@@ -129,7 +129,7 @@ UCHAR ChessShape::bitCount(UCHAR p)
 	p = (p & 0x0F) + ((p >> 4) & 0x0F);
 	return p;
 }
-//»ñÈ¡ÆåĞÍ·Ö
+//è·å–æ£‹å‹åˆ†
 short ChessShape::getShapePrior(UCHAR p1, UCHAR p2)
 {
 	int score = 0;
@@ -160,7 +160,7 @@ short ChessShape::getShapeRank(UCHAR p1, UCHAR p2)
 	}
 	return score;
 }
-//¼ÆËãÑ¡µã·ÖÖµ
+//è®¡ç®—é€‰ç‚¹åˆ†å€¼
 short ChessShape::calPrior(UCHAR pattern[4][2],int who)
 {
 	short v1 = shapePrior[pattern[0][1]][pattern[0][0]] + shapePrior[pattern[1][1]][pattern[1][0]] + shapePrior[pattern[2][1]][pattern[2][0]] + shapePrior[pattern[3][1]][pattern[3][0]];

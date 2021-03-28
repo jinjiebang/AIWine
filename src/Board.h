@@ -10,30 +10,30 @@
 class Board
 {
 public:
-	Chess board[1024];						//ÆåÅÌÊı×é,¼ÇÂ¼Ã¿¸öÎ»ÖÃµÄÏà¹ØĞÅÏ¢
-	Point remPoint[1024];					//¼ÇÂ¼Ã¿²½ÆåµÄÎ»ÖÃ
-	Chess* remChess[1024];					//¼ÇÂ¼Ã¿²½ÆåµÄchessÖ¸Õë
-	Point remULCand[1024];					//¼ÇÂ¼×óÉÏ½Ç
-	Point remLRCand[1024];					//¼ÇÂ¼ÓÒÏÂ½Ç
-	int chessCount;							//Æå×ÓÊı
-	Piece who, opp;							//µ±Ç°ÏÂ×Ó·½£¬ÒÔ¼°ÁíÒ»·½
-	int nShape[2][16];						//Ë«·½ÏÂÒ»²½ÄÜ³ÉµÄÆåĞÎÍ³¼Æ
-	int boardSize;							//ÆåÅÌ³ß´ç
-	Point upperLeft;						//×óÉÏ½Ç
-	Point lowerRight;						//ÓÒÏÂ½Ç
-	int ply;								//µ±Ç°ËÑË÷²ãÊı
-	int maxPly;								//Êµ¼ÊËÑË÷µÄ×î´ó²ãÊı
-	long t_VCT_Start;						//VCT¿ªÊ¼ËÑË÷Ê±¼ä
-	long t_VCF_Start;						//VCF¿ªÊ¼ËÑË÷Ê±¼ä
-	int vctNode;							//VCT½ÚµãÊı
-	int vcfNode;							//VCF½ÚµãÊı
-	const int MAX_VCF_DEPTH = 20;			//×î´óvcfÉî¶È
-	const int MAX_VCT_DEPTH = 16;			//×î´óvctÉî¶È
-	const int MAX_DEFNED_FOUR = 6;			//vctËãÉ±Ê±£¬ËãÉ±·½ÓĞ»îÈıÊ±£¬·ÀÊØ·½×î¶àÄÜ³å¼¸¸öËÄ
-	const int MAX_VCT_TIME = 1000;			//VCTÊ±¼ä(ºÁÃë£©
-	int Range4[32];							//4¸ñÄÚµÄÃ××Ö·¶Î§
-	int Range3[32];							//3¸ñÄÚµÄÃ××Ö·¶Î§ºÍ°ËØÔµã
-	int fivePoint[2];						//¼ÇÂ¼³ÉÎåµã
+	Chess board[1024];						//æ£‹ç›˜æ•°ç»„,è®°å½•æ¯ä¸ªä½ç½®çš„ç›¸å…³ä¿¡æ¯
+	Point remPoint[1024];					//è®°å½•æ¯æ­¥æ£‹çš„ä½ç½®
+	Chess* remChess[1024];					//è®°å½•æ¯æ­¥æ£‹çš„chessæŒ‡é’ˆ
+	Point remULCand[1024];					//è®°å½•å·¦ä¸Šè§’
+	Point remLRCand[1024];					//è®°å½•å³ä¸‹è§’
+	int chessCount;							//æ£‹å­æ•°
+	Piece who, opp;							//å½“å‰ä¸‹å­æ–¹ï¼Œä»¥åŠå¦ä¸€æ–¹
+	int nShape[2][16];						//åŒæ–¹ä¸‹ä¸€æ­¥èƒ½æˆçš„æ£‹å½¢ç»Ÿè®¡
+	int boardSize;							//æ£‹ç›˜å°ºå¯¸
+	Point upperLeft;						//å·¦ä¸Šè§’
+	Point lowerRight;						//å³ä¸‹è§’
+	int ply;								//å½“å‰æœç´¢å±‚æ•°
+	int maxPly;								//å®é™…æœç´¢çš„æœ€å¤§å±‚æ•°
+	long t_VCT_Start;						//VCTå¼€å§‹æœç´¢æ—¶é—´
+	long t_VCF_Start;						//VCFå¼€å§‹æœç´¢æ—¶é—´
+	int vctNode;							//VCTèŠ‚ç‚¹æ•°
+	int vcfNode;							//VCFèŠ‚ç‚¹æ•°
+	const int MAX_VCF_DEPTH = 20;			//æœ€å¤§vcfæ·±åº¦
+	const int MAX_VCT_DEPTH = 16;			//æœ€å¤§vctæ·±åº¦
+	const int MAX_DEFNED_FOUR = 6;			//vctç®—æ€æ—¶ï¼Œç®—æ€æ–¹æœ‰æ´»ä¸‰æ—¶ï¼Œé˜²å®ˆæ–¹æœ€å¤šèƒ½å†²å‡ ä¸ªå››
+	const int MAX_VCT_TIME = 1000;			//VCTæ—¶é—´(æ¯«ç§’ï¼‰
+	int Range4[32];							//4æ ¼å†…çš„ç±³å­—èŒƒå›´
+	int Range3[32];							//3æ ¼å†…çš„ç±³å­—èŒƒå›´å’Œå…«å¦ç‚¹
+	int fivePoint[2];						//è®°å½•æˆäº”ç‚¹
 	
 	Board(HashTable* _hashTable);
 	void initBoard(int size);
@@ -56,7 +56,7 @@ public:
 	Point findVCFLastPoint();	
 	Point findVCTLastPoint();
 
-	//ÄÚÁª·½·¨
+	//å†…è”æ–¹æ³•
 	void vctStart() { t_VCT_Start = getTime(); vctNode = 0; }
 	void vcfStart() { t_VCF_Start = getTime(); vcfNode = 0; }
 	long getVCTCost() { return getTime() - t_VCT_Start; }
