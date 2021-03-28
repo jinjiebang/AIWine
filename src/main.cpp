@@ -245,6 +245,7 @@ void drawBoard(int board[15][15])
 				break;
 
 			}
+			cout<<" ";
 		}
 		//行末换行
 		cout << endl;
@@ -276,8 +277,14 @@ void simpleUI()
 			y = (inputStr[1] - '0') * 10 + inputStr[2] - '1';
 		}
 		ai->turnMove(x, y);
-		board[x][y] = color;
+		board[y][x] = color;
 		color = 3 - color;
+		drawBoard(board);
+		// ai 思考下一步
+		int nextX, nextY;
+		ai->turnBest(nextX, nextY);
+		board[nextY][nextX] = color;
+		color = 3- color;
 		drawBoard(board);
 	} while (!exit);
 	delete ai;

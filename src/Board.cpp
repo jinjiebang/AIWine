@@ -885,7 +885,7 @@ void Board::getEmptyCand(Cand cand[], int &nCand)
 //检查棋型数量是否正确
 bool Board::check()
 {
-	int n[2][10] = { 0 };
+	int n[COLOR_COUNT][FOUR_SHAPE_COUNT] = { 0 };
 	for (int m = 0; m < 1024; m++)
 	{
 		if (board[m].piece==EMPTY)
@@ -894,8 +894,8 @@ bool Board::check()
 			n[1][board[m].shape4[1]]++;
 		}
 	}
-	for (int i = 0; i < 2; i++)
-		for (int j = 1; j < 10; j++)
+	for (int i = 0; i < COLOR_COUNT; i++)
+		for (int j = 1; j < FOUR_SHAPE_COUNT; j++)
 			if (n[i][j] != nShape[i][j])
 			{
 				return false;
