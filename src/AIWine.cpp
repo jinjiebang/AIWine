@@ -150,13 +150,13 @@ void AIWine::turnBest(int &x, int &y)
 	if (board->vcfSearch(&rootBest.point) > 0)
 	{
 		isSolved = true;
-		cout << "MESSAGE VCF算杀成功！必胜点["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
+		cout << "MESSAGE VCF success! win point["<< pointX(rootBest.point) - 4 <<", "<< pointY(rootBest.point) - 4 <<"]"<< endl;
 	}
 	//再算vct
 	if (!isSolved&&board->vctSearch(&rootBest.point) > 0)
 	{
 		isSolved = true;
-		cout << "MESSAGE VCT算杀成功！必胜点[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
+		cout << "MESSAGE VCT success! win point[" << pointX(rootBest.point) - 4 << ", " << pointY(rootBest.point) - 4 << "]" << endl;
 	}
 	//算对方的VCT,删除对方能VCT胜的点
 	if (!isSolved)
@@ -168,12 +168,12 @@ void AIWine::turnBest(int &x, int &y)
 		{
 			isSolved = true;
 			rootBest.point = bestPoint;
-			cout << "MESSAGE 对方VCT必胜!"<< endl;
+			cout << "MESSAGE opp VCT win!"<< endl;
 		}
 		else if (nRootCand == 1)
 		{
 			//这里没有把isSolved设为true,是想通过搜索来给出一个评价分
-			cout << "MESSAGE 通过VCT搜索到唯一落子!" << endl;
+			cout << "MESSAGE find one cand by VCT" << endl;
 		}
 	}
 	if (!isSolved)
@@ -196,16 +196,16 @@ void AIWine::turnBest(int &x, int &y)
 			board->sortCand(rootCand, nRootCand);
 			if (depth > MinDepth && isCheckVCT[rootBest.point]) continue;
 			best.point = checkOppVct();
-			cout << "MESSAGE 每层搜索后的VCT花费时间" << board->getVCTCost() << "ms" << endl;
+			cout << "MESSAGE VCT cost time:" << board->getVCTCost() << "ms" << endl;
 			if (nRootCand == 0)
 			{
 				rootBest.point = best.point;
-				cout << "MESSAGE 对方VCT必胜!" << endl;
+				cout << "MESSAGE opp vct win!" << endl;
 				break;
 			}
 			else if (nRootCand == 1)
 			{
-				cout << "MESSAGE 通过VCT搜索到唯一落子!" << endl;
+				cout << "MESSAGE find one cand by VCT!" << endl;
 				rootBest = rootCand[0];
 				break;
 			}
@@ -330,7 +330,7 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 
 		if (value >= beta)
 		{
-			if(!terminateAI) hashTable->update(beta, depth, HASH_BETA, cand[i].point);
+			if(!terminateAI && beta != alpha + 1) hashTable->update(beta, depth, HASH_BETA, cand[i].point);
 			return beta;
 		}
 		if (value > alpha)
@@ -341,7 +341,7 @@ int AIWine::search(int depth, int alpha, int beta,int extend)
 		}
 		if (terminateAI) break;
 	}
-	if (!terminateAI)
+	if (!terminateAI && beta != alpha + 1)
 	{
 		hashTable->update(alpha, depth, hash_flag, best);
 	}

@@ -26,8 +26,8 @@ public:
 	//查询置换表
 	int queryRecord(int depth,int alpha,int beta)
 	{
-		//如果是pv节点,不做置换表截断
-	/*	if (beta > alpha + 1) return InvalidVal;*/
+		//如果是pvs节点,不做置换表截断
+		if (beta == alpha + 1) return InvalidVal;
 		if (currentItem->key == hashKey)
 		{
 			if (currentItem->flag == HASH_EXACT && (currentItem->value == WinScore || currentItem->value == LoseScore))

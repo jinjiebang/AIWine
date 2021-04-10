@@ -15,4 +15,4 @@ aux_source_directory(./src SrcFiles)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # 指定生成目标
-add_executable(wine ${SrcFiles})
+add_executable(pbrain-wine ${SrcFiles})

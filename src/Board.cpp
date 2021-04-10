@@ -438,7 +438,7 @@ int Board::vctSearch(int *winPoint)
 			}
 		}
 		long vctTime = getVCTCost();
-		cout << "MESSAGE VCT花费时间：" << vctTime << "ms 节点数：" << vctNode << " 层数：" << __min(depth, MAX_VCT_DEPTH) << endl;
+		cout << "MESSAGE VCT cost time:" << vctTime << "ms  node:" << vctNode << "  depth:" << __min(depth, MAX_VCT_DEPTH) << endl;
 		return result;
 	}
 	return 0;
@@ -451,7 +451,7 @@ int Board::vcfSearch(int *winPoint)
 		vcfStart();
 		result = vcfSearch(who, 0, startPoint, winPoint);
 		long time = getVCFCost();
-		cout << "MESSAGE VCF花费时间：" << time << "ms 节点数：" << vcfNode << endl;
+		cout << "MESSAGE VCF cost time:" << time << "ms  node:" << vcfNode << endl;
 		return result;
 	}
 	return 0;

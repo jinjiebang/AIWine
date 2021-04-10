@@ -291,7 +291,6 @@ void simpleUI()
 }
 int main()
 {
-	system("chcp 65001");
 	gomocup();
 	return 0;
 }
