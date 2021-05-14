@@ -6,6 +6,7 @@ project(wine)
 
 # 显示指定使用的C++编译器 
 set(CMAKE_CXX_COMPILER "g++")
+set(CMAKE_CXX_FLAGS "-std=c++17 -O3 -finline-functions -funroll-all-loops -fno-rtti -msse4.2 -pthread -lm -m64 -DIS_64BIT -flto -Wall -Wcast-qual -pedantic -Wextra -Wshadow -fstrict-aliasing -DNDEBUG" )
 
 # 添加include路径
 include_directories(${PROJECT_SOURCE_DIR}/include)

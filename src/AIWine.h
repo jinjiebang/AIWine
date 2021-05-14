@@ -44,7 +44,7 @@ public:
 	int delVctLose();
 	int checkOppVct();
 	void showDepthInfo(int depth, Cand best, long td);
-	long stopTime() { return start_time + __min(timeout_turn, time_left / 7) - 30; }
+	long stopTime() { return start_time + std::min(timeout_turn, time_left / 7) - 30; }
 	long getTime() { return clock() * 1000 / CLOCKS_PER_SEC; }
 	int pointX(int index) { return index >> 5; }
 	int pointY(int index) { return index & 31; }
