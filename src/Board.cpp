@@ -438,7 +438,7 @@ int Board::vctSearch(int *winPoint)
 			}
 		}
 		long vctTime = getVCTCost();
-		cout << "MESSAGE VCT cost time:" << vctTime << "ms  node:" << vctNode << "  depth:" << __min(depth, MAX_VCT_DEPTH) << endl;
+		cout << "MESSAGE VCT cost time:" << vctTime << "ms  node:" << vctNode << "  depth:" << std::min(depth, MAX_VCT_DEPTH) << endl;
 		return result;
 	}
 	return 0;
